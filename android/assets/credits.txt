@@ -1,0 +1,20 @@
+Bullet Sprites by Master484:
+http://opengameart.org/content/bullet-collection-2-m484-games
+Released to Public Domain (CC0)
+
+Ship Sprites by clayster2012:
+http://opengameart.org/content/space-ship-collection
+Licensed under OpenGameArt.org Attribution 3.0 Unported
+http://opengameart.org/content/oga-by-30-faq
+
+Sound effects made with BFXR and mixed with Audacity
+
+Background generated using GIMP
+
+Music: "Summon the Rawk" by Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/
+
+Player Death Sound: "Shipboard Railgun" by roper1911
+http://freesound.org/people/roper1911/sounds/155790/
+Released to Public Domain (CC0)
