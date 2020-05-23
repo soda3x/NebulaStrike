@@ -8,17 +8,31 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class SpaceShooter extends Game implements ApplicationListener {
-
-	// The class with the menu
-	private static MenuScreen menuScreen;
-
-	// The class with the game
-	private static GameScreen gameScreen;
+public class SpaceShooter extends ApplicationAdapter {
+	private SpriteBatch batch;
+	private Texture img;
+	private SpaceShooter instance;
 
 	/**
-	 * Create necessary objects and set default screen
+	 * Constructor is private so as to enforce singleton design pattern
+	 * Calls create()
 	 */
+	private SpaceShooter() {
+		this.create();
+	}
+
+	/**
+	 * SpaceShooter should be singleton, call create in private constructor
+	 * and use get instance to enforce shared object usage
+	 * @return instance of SpaceShooter
+	 */
+	public SpaceShooter getSpaceShooterInstance() {
+		if (instance == null) {
+			instance = new SpaceShooter();
+		}
+		return instance;
+	}
+	
 	@Override
 	public void create () {
 		// Create game screen and menu screen
