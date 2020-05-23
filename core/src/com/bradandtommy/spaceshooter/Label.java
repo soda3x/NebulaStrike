@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.bradandtommy.spaceshooter;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;

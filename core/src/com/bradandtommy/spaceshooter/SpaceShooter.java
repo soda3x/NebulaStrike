@@ -8,10 +8,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class SpaceShooter extends ApplicationAdapter {
+import java.awt.Menu;
+
+public class SpaceShooter extends Game implements ApplicationListener {
 	private SpriteBatch batch;
 	private Texture img;
-	private SpaceShooter instance;
+	private static SpaceShooter instance;
+	private GameScreen gameScreen;
+	private MenuScreen menuScreen;
 
 	/**
 	 * Constructor is private so as to enforce singleton design pattern
@@ -26,7 +30,7 @@ public class SpaceShooter extends ApplicationAdapter {
 	 * and use get instance to enforce shared object usage
 	 * @return instance of SpaceShooter
 	 */
-	public SpaceShooter getSpaceShooterInstance() {
+	 public static SpaceShooter getSpaceShooterInstance() {
 		if (instance == null) {
 			instance = new SpaceShooter();
 		}
@@ -36,14 +40,22 @@ public class SpaceShooter extends ApplicationAdapter {
 	@Override
 	public void create () {
 		// Create game screen and menu screen
-		gameScreen = new GameScreen(this);
-		menuScreen = new MenuScreen(this);
+		gameScreen = new GameScreen();
+		menuScreen = new MenuScreen();
 
 		// Set window title
-		Gdx.graphics.setTitle(menuScreen.GAME_NAME);
+//		Gdx.graphics.setTitle("Nebula Strike");
 
 		// Change screens to the menu
-		setScreen(menuScreen);
+		this.setScreen(menuScreen);
+	}
+
+	GameScreen getGameScreen() {
+		return gameScreen;
+	}
+
+	public MenuScreen getMenuScreen() {
+		return menuScreen;
 	}
 
 	/**

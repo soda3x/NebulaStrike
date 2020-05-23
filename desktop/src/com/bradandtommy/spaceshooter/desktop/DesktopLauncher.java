@@ -7,6 +7,6 @@ import com.bradandtommy.spaceshooter.SpaceShooter;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new SpaceShooter(), config);
+		new LwjglApplication(SpaceShooter.getSpaceShooterInstance(), config);
 	}
 }

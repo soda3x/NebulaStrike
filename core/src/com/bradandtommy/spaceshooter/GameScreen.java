@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.bradandtommy.spaceshooter;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
@@ -12,23 +12,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-class GameScreen implements Screen{
-
-    MyGdxGame game; // Note it's "MyGdxGame" not "Game"
-
+class GameScreen implements Screen {
     private SpriteBatch batch;
     private Skin skin;
     private Stage stage;
     private OrthographicCamera camera;
 
-    // constructor to keep a reference to the main Game class
-    public GameScreen(MyGdxGame game){
-        this.game = game;
-    }
-
-    public void create() {
-        //Gdx.app.log("GameScreen: ","menuScreen create");
-
+    private void create() {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         camera = new OrthographicCamera(w, h);
@@ -65,11 +55,9 @@ class GameScreen implements Screen{
 
     @Override
     public void show() {
-        Gdx.app.log("GameScreen: ","gameScreen show called");
-        create();
+        this.create();
     }
+
     @Override
-    public void hide() {
-        Gdx.app.log("GameScreen: ","gameScreen hide called");
-    }
+    public void hide() {}
 }

@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.bradandtommy.spaceshooter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -13,11 +13,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Represent menu screen
  */
 public class MenuScreen implements Screen, InputProcessor {
-    // Main Game class
-    private MyGdxGame game;
-
-    // The constants for the texts
-    public static final String GAME_NAME = "NEBULA STRIKE";
 
     // The constants for the buttons
     private static final String BUTTON_LONG_UP_TEXTURE_FILENAME = "buttonLong_blue.png";
@@ -26,12 +21,12 @@ public class MenuScreen implements Screen, InputProcessor {
     private static final float BUTTON_HEIGHT = 80f;
     private static final float BUTTON_SPACING = 10f;
 
-    // The constants for kinds of sound
-    private static final String PLAY_SOUND_FILENAME = "sound/button-1_newgame.mp3";
-    private static final String EXIT_SOUND_FILENAME = "sound/button-4_alert.mp3";
+    // The constants for button sounds
+    private static final String BUTTON_1 = "sound/button1.mp3";
+    private static final String BUTTON_2 = "sound/button2.wav";
 
-    // The constants for music
-    private static final String MENU_MUSIC_FILENAME = "sound/Mysterious-piano-theme.mp3";
+    // The constant for menu music
+    private static final String MENU_MUSIC_FILENAME = "music/menu_theme.wav";
 
     // The constants for font
     private static final String FONT_FONT_FILENAME = "good_neighbors.fnt";
@@ -65,20 +60,9 @@ public class MenuScreen implements Screen, InputProcessor {
     private boolean quitActive;
 
     /**
-     * Constructor to keep a reference to the main Game class
-     * @param game main Game class
-     */
-    public MenuScreen(MyGdxGame game) {
-        this.game = game;
-    }
-
-    /**
      * Create and instantiate necessary objects
      */
-    public void create() {
-        // Instantiate SpriteBatch
-        batch = new SpriteBatch();
-
+    private void create() {
         // Create font for game's name label
         labelFont = new BitmapFont(
                 Gdx.files.internal(FONT_FONT_FILENAME),
@@ -97,7 +81,7 @@ public class MenuScreen implements Screen, InputProcessor {
         buttonFont.getData().setScale(2, 2);
 
         // Create label for the game's name
-        gameNameLabel = new Label(labelFont, GAME_NAME,
+        gameNameLabel = new Label(labelFont, "Nebula Strike",
                 0f, Gdx.graphics.getHeight() - BUTTON_HEIGHT, Gdx.graphics.getWidth(), BUTTON_HEIGHT,
                 Label.Alignment.CENTER, Label.Alignment.CENTER
         );
@@ -108,23 +92,23 @@ public class MenuScreen implements Screen, InputProcessor {
         buttonLongTexture = new Texture(BUTTON_LONG_UP_TEXTURE_FILENAME);
         buttonLongDownTexture = new Texture(BUTTON_LONG_DOWN_TEXTURE_FILENAME);
         float buttonX = (Gdx.graphics.getWidth() - BUTTON_WIDTH) / 2;
-        float buttonY = (Gdx.graphics.getHeight() - 2 * BUTTON_HEIGHT) ;
+        float buttonY = (Gdx.graphics.getHeight() - 2 * BUTTON_HEIGHT);
 
         startButton = new Button(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
         startButton.setText(buttonFont, "Start", Label.Alignment.CENTER, Label.Alignment.CENTER);
-        startButton.setSound(PLAY_SOUND_FILENAME);
+        startButton.setSound(BUTTON_1);
 
         creditButton = new Button(buttonX, buttonY - (BUTTON_HEIGHT + BUTTON_SPACING), BUTTON_WIDTH, BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
         creditButton.setText(buttonFont, "Credit", Label.Alignment.CENTER, Label.Alignment.CENTER);
-        creditButton.setSound(EXIT_SOUND_FILENAME);
+        creditButton.setSound(BUTTON_1);
 
         scoreboardButton = new Button(buttonX, buttonY - 2 * (BUTTON_HEIGHT + BUTTON_SPACING), BUTTON_WIDTH, BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
         scoreboardButton.setText(buttonFont, "Scoreboard", Label.Alignment.CENTER, Label.Alignment.CENTER);
-        scoreboardButton.setSound(EXIT_SOUND_FILENAME);
+        scoreboardButton.setSound(BUTTON_1);
 
         quitButton = new Button(buttonX, buttonY - 3 * (BUTTON_HEIGHT + BUTTON_SPACING), BUTTON_WIDTH, BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
         quitButton.setText(buttonFont, "Quit", Label.Alignment.CENTER, Label.Alignment.CENTER);
-        quitButton.setSound(EXIT_SOUND_FILENAME);
+        quitButton.setSound(BUTTON_1);
 
         // Create background music and init it
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal(MENU_MUSIC_FILENAME));
@@ -139,6 +123,8 @@ public class MenuScreen implements Screen, InputProcessor {
 
         // Enable receiving all touch and key input events
         Gdx.input.setInputProcessor(this);
+        // Instantiate SpriteBatch
+        batch = new SpriteBatch();
     }
 
     /**
@@ -178,7 +164,7 @@ public class MenuScreen implements Screen, InputProcessor {
             quitActive = true;
 
         } else if (startActive) {
-            game.setScreen(MyGdxGame.gameScreen);
+            SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameScreen());
         } else if (creditActive) {
             ;
         } else if (scoreboardActive) {
