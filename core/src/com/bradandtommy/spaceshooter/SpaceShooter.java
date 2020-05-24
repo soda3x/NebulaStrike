@@ -16,6 +16,8 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	private static SpaceShooter instance;
 	private GameScreen gameScreen;
 	private MenuScreen menuScreen;
+	private CreditsScreen creditsScreen;
+	private ScoreScreen scoreScreen;
 
 	/**
 	 * Constructor is private so as to enforce singleton design pattern
@@ -27,6 +29,10 @@ public class SpaceShooter extends Game implements ApplicationListener {
 		// Create game screen and menu screen
 		gameScreen = new GameScreen();
 		menuScreen = new MenuScreen();
+		creditsScreen = new CreditsScreen();
+		scoreScreen = new ScoreScreen();
+
+
 	}
 
 	/**
@@ -53,10 +59,12 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	GameScreen getGameScreen() {
 		return gameScreen;
 	}
-
-	public MenuScreen getMenuScreen() {
+	MenuScreen getMenuScreen() {
 		return menuScreen;
 	}
+	CreditsScreen getCreditsScreen() { return creditsScreen; }
+	ScoreScreen getScoreScreen() { return scoreScreen; }
+
 
 	/**
 	 * This method calls the super class render
