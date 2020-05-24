@@ -13,7 +13,7 @@ import java.util.PriorityQueue;
 class ScoreIO {
     private PriorityQueue<Score> scores;
 
-    public ScoreIO() {
+    ScoreIO() {
         scores = new PriorityQueue<Score>(new Comparator<Score>() {
             @Override
             public int compare(Score s1, Score s2) {

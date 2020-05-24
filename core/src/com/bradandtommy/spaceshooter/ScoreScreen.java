@@ -53,10 +53,10 @@ class ScoreScreen implements Screen, InputProcessor {
         labelFont.setColor(0f,1f,0f,1f);
 
         headerFont.getData().setScale(2, 2);
-        headerFont.setColor(0f,1f,0f,1f);
+        headerFont.setColor(1f,1f,1f,1f);
 
         scoreFont.getData().setScale(1, 1);
-        scoreFont.setColor(0f,1f,0f,1f);
+        scoreFont.setColor(1f,1f,1f,0.75f);
 
         // Create font for buttons' labels
         BitmapFont buttonFont = new BitmapFont(
@@ -90,8 +90,8 @@ class ScoreScreen implements Screen, InputProcessor {
         backToMenuButton.setSound(Constants.BUTTON_SND_1);
 
         // Create background music and init it
-        menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.MENU_MUSIC_FILENAME));
-        menuMusic.setLooping(false);
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.SCOREBOARD_MUSIC_FILENAME));
+        menuMusic.setLooping(true);
         menuMusic.play();
 
         // Enable receiving all touch and key input events

@@ -14,10 +14,17 @@ public class Constants {
 
     // The constant for menu music
     public static final String MENU_MUSIC_FILENAME = "music/menu.mp3";
+    public static final String SCOREBOARD_MUSIC_FILENAME = "music/scores.mp3";
 
     // The constants for font
     public static final String FONT_FONT_FILENAME = "good_neighbors.fnt";
     public static final String FONT_IMAGE_FILENAME = "good_neighbors.png";
     public static final String FONT_FONT_FILENAME2 = "gui/default.fnt";
     public static final String FONT_IMAGE_FILENAME2 = "gui/default.png";
+
+    // The constants for player
+    public static final String PLAYER_SPRITESHEET = "sprites/Player.png";
+    public static final float PLAYER_SPEED = 300.0f;
+    public static final float PLAYER_ACCEL = 100.0f;
+    public static final float PLAYER_TRACTION = 50.0f;
 }
