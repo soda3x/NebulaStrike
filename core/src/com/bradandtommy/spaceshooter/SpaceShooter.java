@@ -23,6 +23,10 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	 */
 	private SpaceShooter() {
 		this.create();
+
+		// Create game screen and menu screen
+		gameScreen = new GameScreen();
+		menuScreen = new MenuScreen();
 	}
 
 	/**
@@ -39,10 +43,6 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	
 	@Override
 	public void create () {
-		// Create game screen and menu screen
-		gameScreen = new GameScreen();
-		menuScreen = new MenuScreen();
-
 		// Set window title
 //		Gdx.graphics.setTitle("Nebula Strike");
 
