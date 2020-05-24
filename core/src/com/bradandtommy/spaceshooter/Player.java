@@ -14,13 +14,19 @@ public class Player {
     private Sprite sprite;
     private Texture playerSheet;
     private Animation playerAnimation;
-    private float x, y;
-    private boolean dead = false;
     private float stateTime;
+
+    private boolean dead = false;
+
     private static final int ROWS = 3;
     private static final int COLUMNS = 3;
+    private static final float FRAME_DURATION = 0.033f;
+
+    private float x, y;
     private Vector2 movement;
     private Vector2 velocity;
+    private boolean hasFired;
+
 
     public Player() {
         this.batch = new SpriteBatch();
@@ -38,8 +44,7 @@ public class Player {
                 playerFrames[index++] = temp[i][j];
             }
         }
-
-        playerAnimation = new Animation<TextureRegion>(0.033f, playerFrames);
+        playerAnimation = new Animation<TextureRegion>(FRAME_DURATION, playerFrames);
     }
 
     public void setPos(OrthographicCamera camera, float x, float y) {
@@ -120,6 +125,14 @@ public class Player {
             newSpeed /= currentSpeed;
             velocity.scl(newSpeed);
         }
+    }
+
+    public boolean hasFired() {
+        GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
+        if (g.getInputPoller().shoot.isDown) {
+            hasFired = true;
+        }
+        return hasFired;
     }
 
     public float getWidth() {

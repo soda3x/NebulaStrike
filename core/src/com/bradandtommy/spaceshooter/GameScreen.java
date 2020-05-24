@@ -10,6 +10,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -23,10 +25,14 @@ class GameScreen implements Screen, InputProcessor {
     private Stage stage;
     private OrthographicCamera camera;
     private Player player;
+    private Background bg;
     private Music initial;
     private Music bgm;
     private boolean showHitboxes = false;
     private InputPoller input;
+    private Texture bg1, bg2;
+    float yMax, yCoordBg1, yCoordBg2;
+    final int BG_MOVE_SPEED = 200;
 
     private void create() {
         input = new InputPoller();
@@ -53,10 +59,17 @@ class GameScreen implements Screen, InputProcessor {
         camera.setToOrtho(false, w, h);
 
         this.player = new Player();
+        this.bg = new Background();
         player.setPos(camera, player.getWidth() / 2, 200);
+        bg.setPos(camera, bg.getWidth() / 2, bg.getHeight() / 2);
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
+        bg1 = new Texture(Gdx.files.internal("sprites/Background_alt.png"));
+        bg2 = new Texture(Gdx.files.internal("sprites/Background_alt.png"));
+        yMax = 480;
+        yCoordBg1 = 0;
+        yCoordBg2 = yMax;
     }
 
     public void render(float f) {
@@ -65,7 +78,36 @@ class GameScreen implements Screen, InputProcessor {
 
         this.update();
 
+        // Scrolling Background
+        yCoordBg1 -= BG_MOVE_SPEED * Gdx.graphics.getDeltaTime();
+        yCoordBg2 = yCoordBg1 - yMax;  // We move the background, not the camera
+        if (yCoordBg1 < 0) {
+            yCoordBg1 = yMax;
+            yCoordBg2 = 0;
+        }
+        batch.begin();
+        batch.draw(bg1, 0, yCoordBg1);
+        batch.draw(bg2, 0, yCoordBg2);
+        batch.end();
+
         player.draw();
+//        bg.draw();
+
+        if (!player.hasFired()) {
+            BitmapFont hintFont = new BitmapFont(
+                    Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                    Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                    false);
+            // Scale up the font slightly to make it more legible on larger screens for DEFAULT
+            hintFont.getData().setScale(1, 1);
+            hintFont.setColor(1f, 1f, 1f, 0.5f);
+            Label hint = new Label(hintFont, Constants.HINT_1,
+                    0f, Gdx.graphics.getHeight() - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                    Label.Alignment.CENTER, Label.Alignment.CENTER);
+            batch.begin();
+            hint.draw(batch);
+            batch.end();
+        }
 
         if (showHitboxes) {
             ShapeRenderer sr = new ShapeRenderer();

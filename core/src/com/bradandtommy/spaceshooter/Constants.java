@@ -26,5 +26,8 @@ public class Constants {
     public static final String PLAYER_SPRITESHEET = "sprites/Player.png";
     public static final float PLAYER_SPEED = 300.0f;
     public static final float PLAYER_ACCEL = 100.0f;
-    public static final float PLAYER_TRACTION = 50.0f;
+    public static final float PLAYER_TRACTION = 500.0f;
+
+    // In game hints
+    public static final String HINT_1 = "Use W, A, S or D to dash in a direction quickly\r\nPress a combination of these keys for more precise movement\r\nShoot to dismiss this message! (Spacebar)";
 }
