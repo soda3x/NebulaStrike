@@ -33,9 +33,6 @@ public class InputPoller {
     public Action moveRight = new Action(Input.Keys.D);
 
     public Action shoot = new Action(Input.Keys.SPACE);
-    public Action next = new Action(Input.Keys.PERIOD);
-    public Action prev = new Action(Input.Keys.COMMA);
-    public Action exit = new Action(Input.Keys.ESCAPE);
 
     public void poll() {
 

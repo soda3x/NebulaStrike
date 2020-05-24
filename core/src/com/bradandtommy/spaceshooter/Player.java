@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+
 public class Player {
     private SpriteBatch batch;
     private Sprite sprite;
@@ -27,6 +29,8 @@ public class Player {
     private Vector2 velocity;
     private boolean hasFired;
 
+    private ArrayList<Bullet> bullets;
+
 
     public Player() {
         this.batch = new SpriteBatch();
@@ -34,7 +38,12 @@ public class Player {
         this.velocity = new Vector2();
         this.sprite = new Sprite();
         this.dead = false;
-        playerSheet = new Texture(Gdx.files.internal("sprites/Player.png"));
+        this.initSprite(Constants.PLAYER_SPRITESHEET);
+        this.bullets = new ArrayList<Bullet>();
+    }
+
+    public void initSprite(String spriteFilePath) {
+        playerSheet = new Texture(Gdx.files.internal(spriteFilePath));
 
         TextureRegion[][] temp = TextureRegion.split(playerSheet, playerSheet.getWidth() / COLUMNS, playerSheet.getHeight() / ROWS);
         TextureRegion[] playerFrames = new TextureRegion[ROWS * COLUMNS];
@@ -124,6 +133,29 @@ public class Player {
             if (newSpeed < 0.0f) newSpeed = 0.0f;
             newSpeed /= currentSpeed;
             velocity.scl(newSpeed);
+        }
+    }
+
+    public void update() {
+        // Move bullets
+        for (Bullet bullet : bullets) {
+            bullet.update(Gdx.graphics.getDeltaTime());
+        }
+        // Check if player is shooting
+        GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
+        if (g.getInputPoller().shoot.isDown) {
+            initSprite(Constants.PLAYER_SPRITESHEET_ALT);
+            bullets.add(new Bullet(this.getX(), this.getY(), Constants.PLAYER_BULLET));
+            for (int i = 0; i < bullets.size(); ++i) {
+                if (bullets.get(i).hasExpired()) {
+                    bullets.remove(bullets.get(i));
+                    continue;
+                }
+                bullets.get(i).draw(this.batch);
+                Gdx.app.log("DEBUG", "Drawing bullet");
+            }
+        } else {
+            initSprite(Constants.PLAYER_SPRITESHEET);
         }
     }
 

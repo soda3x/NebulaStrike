@@ -19,6 +19,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import java.util.ArrayList;
+
 class GameScreen implements Screen, InputProcessor {
     private SpriteBatch batch;
     private Skin skin;
@@ -33,8 +35,15 @@ class GameScreen implements Screen, InputProcessor {
     private Texture bg1, bg2;
     float yMax, yCoordBg1, yCoordBg2;
     final int BG_MOVE_SPEED = 200;
+    private long score;
+    private long level;
+    private int lives;
+
 
     private void create() {
+        level = 1;
+        score = 0;
+        lives = 3;
         input = new InputPoller();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -91,7 +100,6 @@ class GameScreen implements Screen, InputProcessor {
         batch.end();
 
         player.draw();
-//        bg.draw();
 
         if (!player.hasFired()) {
             BitmapFont hintFont = new BitmapFont(
@@ -109,6 +117,33 @@ class GameScreen implements Screen, InputProcessor {
             batch.end();
         }
 
+        // Draw HUD with running score and level counters
+        BitmapFont hudFont = new BitmapFont(
+                Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                false);
+
+        hudFont.getData().setScale(1, 1);
+        hudFont.setColor(1f, 1f, 1f, 1f);
+
+        Label runningScore = new Label(hudFont, "Score: " + score,
+                (camera.position.x) + 100f,Gdx.graphics.getHeight() - Constants.BUTTON_HEIGHT, 100f, Constants.BUTTON_HEIGHT,
+                Label.Alignment.RIGHT, Label.Alignment.CENTER);
+
+        Label runningLevel = new Label(hudFont, "Level: " + level,
+                (camera.position.x / 2) - 100f, Gdx.graphics.getHeight() - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                Label.Alignment.LEFT, Label.Alignment.CENTER);
+
+        Label runningLife = new Label(hudFont, "Lives left: " + lives,
+                (camera.position.x / 2) - 100f, (camera.position.y / 2) - 125f, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                Label.Alignment.LEFT, Label.Alignment.CENTER);
+
+        batch.begin();
+        runningScore.draw(batch);
+        runningLevel.draw(batch);
+        runningLife.draw(batch);
+        batch.end();
+
         if (showHitboxes) {
             ShapeRenderer sr = new ShapeRenderer();
             sr.begin(ShapeRenderer.ShapeType.Line);
@@ -125,6 +160,7 @@ class GameScreen implements Screen, InputProcessor {
         camera.update();
 
         player.move(Gdx.graphics.getDeltaTime());
+        player.update();
 
         // DEBUG: Toggle hitboxes if H is pressed
         if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {

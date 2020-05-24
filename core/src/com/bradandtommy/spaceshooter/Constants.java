@@ -24,6 +24,8 @@ public class Constants {
 
     // The constants for player
     public static final String PLAYER_SPRITESHEET = "sprites/Player.png";
+    public static final String PLAYER_SPRITESHEET_ALT = "sprites/Player_shooting.png";
+    public static final String PLAYER_BULLET = "sprites/Bullet_player.png";
     public static final float PLAYER_SPEED = 300.0f;
     public static final float PLAYER_ACCEL = 100.0f;
     public static final float PLAYER_TRACTION = 500.0f;
