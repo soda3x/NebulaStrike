@@ -10,16 +10,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.awt.Font;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 class ScoreScreen implements Screen, InputProcessor {
     private SpriteBatch batch;
 
-    // Font for name label and button
-    private BitmapFont labelFont;
-    private BitmapFont buttonFont;
-
     // Labels
     private Label menuLabel;
+    private Label headerLabel;
+    private ArrayList<Label> scoreLabels;
 
     // Buttons
     private Button backToMenuButton;
@@ -30,8 +31,20 @@ class ScoreScreen implements Screen, InputProcessor {
     // Init active flags by false
     private boolean backToMenuActive;
 
-    public void create() {
-        labelFont = new BitmapFont(
+    // Scores
+    private ScoreIO scores;
+
+    private void create() {
+        // Font for name label and button
+        BitmapFont labelFont = new BitmapFont(
+                Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                false);
+        BitmapFont headerFont = new BitmapFont(
+                Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                false);
+        BitmapFont scoreFont = new BitmapFont(
                 Gdx.files.internal(Constants.FONT_FONT_FILENAME),
                 Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
                 false);
@@ -39,8 +52,14 @@ class ScoreScreen implements Screen, InputProcessor {
         labelFont.getData().setScale(4, 4);
         labelFont.setColor(0f,1f,0f,1f);
 
+        headerFont.getData().setScale(2, 2);
+        headerFont.setColor(0f,1f,0f,1f);
+
+        scoreFont.getData().setScale(1, 1);
+        scoreFont.setColor(0f,1f,0f,1f);
+
         // Create font for buttons' labels
-        buttonFont = new BitmapFont(
+        BitmapFont buttonFont = new BitmapFont(
                 Gdx.files.internal(Constants.FONT_FONT_FILENAME),
                 Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
                 false);
@@ -50,6 +69,11 @@ class ScoreScreen implements Screen, InputProcessor {
         // Create label for the game's name
         menuLabel = new Label(labelFont, "High Scores",
                 0f, Gdx.graphics.getHeight() - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                Label.Alignment.CENTER, Label.Alignment.CENTER
+        );
+
+        headerLabel = new Label(headerFont, "Name             Level             Score",
+                0f, Gdx.graphics.getHeight() - 2 * Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
                 Label.Alignment.CENTER, Label.Alignment.CENTER
         );
 
@@ -75,9 +99,39 @@ class ScoreScreen implements Screen, InputProcessor {
 
         backToMenuActive = false;
 
+        // Initialise scores
+        scores = new ScoreIO();
+        scoreLabels = new ArrayList<Label>();
+        initScoreLabels(scoreFont);
+
+
         // Instantiate SpriteBatch
         batch = new SpriteBatch();
     }
+
+    private void drawScores(SpriteBatch batch) {
+        for (Label label : scoreLabels) {
+            label.draw(batch);
+        }
+    }
+
+    private void initScoreLabels(BitmapFont font) {
+        // Prepare Labels for top 5 scores
+        for (int i = 0; i < 5; ++i) {
+            Score score = scores.getScores().poll();
+            if (score == null) {
+                // If no score for whatever reason just use dummy score
+                score = new Score("ABC", 1, 1000);
+            }
+            Label label = new Label(font,score.getName() + "                                      " + score.getLevel() + "                                   " + score.getScore(),
+                    0f, Gdx.graphics.getHeight() - (i + 7)  * 30, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                    Label.Alignment.CENTER, Label.Alignment.CENTER
+            );
+            scoreLabels.add(label);
+        }
+
+    }
+
     @Override
     public void show() { this.create(); }
 
@@ -91,6 +145,8 @@ class ScoreScreen implements Screen, InputProcessor {
 
         //Draw game name label
         menuLabel.draw(batch);
+        headerLabel.draw(batch);
+        drawScores(batch);
 
         //Draw buttons
         backToMenuButton.draw(batch);
