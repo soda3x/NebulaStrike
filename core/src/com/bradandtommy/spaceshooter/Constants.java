@@ -12,9 +12,12 @@ public class Constants {
     public static final String BUTTON_SND_1 = "sound/button1.mp3";
     public static final String BUTTON_SND_2 = "sound/button2.wav";
 
-    // The constant for menu music
+    // The constants for music
     public static final String MENU_MUSIC_FILENAME = "music/menu.mp3";
     public static final String SCOREBOARD_MUSIC_FILENAME = "music/scores.mp3";
+    public static final String GAMESCREEN_INITIAL_MUSIC = "music/start.mp3";
+    public static final String GAMESCREEN_MUSIC_LOOP = "music/level.mp3";
+    public static final float MUSIC_VOLUME = 0f;
 
     // The constants for font
     public static final String FONT_FONT_FILENAME = "good_neighbors.fnt";

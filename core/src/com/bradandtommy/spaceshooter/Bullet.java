@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Bullet {
 
-    public static final int SPEED = 10;
+    public static final int SPEED = 250;
     private Sprite sprite;
     private float x, y;
     private boolean expired = false;

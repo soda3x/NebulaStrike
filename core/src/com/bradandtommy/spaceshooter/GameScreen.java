@@ -38,6 +38,7 @@ class GameScreen implements Screen, InputProcessor {
     private long score;
     private long level;
     private int lives;
+    private long timeElapsed;
 
 
     private void create() {
@@ -48,13 +49,15 @@ class GameScreen implements Screen, InputProcessor {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        initial = Gdx.audio.newMusic(Gdx.files.internal("music/start.mp3"));
+        initial = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_INITIAL_MUSIC));
         initial.setLooping(false);
         initial.play();
+        initial.setVolume(Constants.MUSIC_VOLUME);
 
         if (initial.isPlaying()) {
-            bgm = Gdx.audio.newMusic(Gdx.files.internal("music/level.mp3"));
+            bgm = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_MUSIC_LOOP));
             bgm.setLooping(true);
+            bgm.setVolume(Constants.MUSIC_VOLUME);
         }
 
         initial.setOnCompletionListener(new Music.OnCompletionListener() {
@@ -84,8 +87,6 @@ class GameScreen implements Screen, InputProcessor {
     public void render(float f) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        this.update();
 
         // Scrolling Background
         yCoordBg1 -= BG_MOVE_SPEED * Gdx.graphics.getDeltaTime();
@@ -144,6 +145,8 @@ class GameScreen implements Screen, InputProcessor {
         runningLife.draw(batch);
         batch.end();
 
+        this.update();
+
         if (showHitboxes) {
             ShapeRenderer sr = new ShapeRenderer();
             sr.begin(ShapeRenderer.ShapeType.Line);
@@ -155,12 +158,15 @@ class GameScreen implements Screen, InputProcessor {
     }
 
     private void update() {
+        // Get amount of time game has been on GameScreen so we can calculate things such as when to fire next bullet
+        this.timeElapsed = System.currentTimeMillis();
+
         input.poll();
 
         camera.update();
 
         player.move(Gdx.graphics.getDeltaTime());
-        player.update();
+        player.update(timeElapsed);
 
         // DEBUG: Toggle hitboxes if H is pressed
         if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {

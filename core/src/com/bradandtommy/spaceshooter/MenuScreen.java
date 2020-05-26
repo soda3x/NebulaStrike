@@ -93,6 +93,7 @@ public class MenuScreen implements Screen, InputProcessor {
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.MENU_MUSIC_FILENAME));
         menuMusic.setLooping(false);
         menuMusic.play();
+        menuMusic.setVolume(Constants.MUSIC_VOLUME);
 
         // Init active flags by false
         startActive = false;

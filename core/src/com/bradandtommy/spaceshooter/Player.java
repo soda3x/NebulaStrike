@@ -31,6 +31,10 @@ public class Player {
 
     private ArrayList<Bullet> bullets;
 
+    private long timeElapsedSinceLastCalled;
+
+    private final long shootCooldownMillis = 300;
+
 
     public Player() {
         this.batch = new SpriteBatch();
@@ -136,7 +140,7 @@ public class Player {
         }
     }
 
-    public void update() {
+    public void update(long timeElapsedWhenCalled) {
         // Move bullets
         for (Bullet bullet : bullets) {
             bullet.update(Gdx.graphics.getDeltaTime());
@@ -144,18 +148,23 @@ public class Player {
         // Check if player is shooting
         GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
         if (g.getInputPoller().shoot.isDown) {
-            initSprite(Constants.PLAYER_SPRITESHEET_ALT);
-            bullets.add(new Bullet(this.getX(), this.getY(), Constants.PLAYER_BULLET));
-            for (int i = 0; i < bullets.size(); ++i) {
-                if (bullets.get(i).hasExpired()) {
-                    bullets.remove(bullets.get(i));
-                    continue;
-                }
-                bullets.get(i).draw(this.batch);
-                Gdx.app.log("DEBUG", "Drawing bullet");
+            if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= shootCooldownMillis) {
+                timeElapsedSinceLastCalled = timeElapsedWhenCalled;
+                initSprite(Constants.PLAYER_SPRITESHEET_ALT);
+                bullets.add(new Bullet(this.getX(), this.getY(), Constants.PLAYER_BULLET));
             }
         } else {
             initSprite(Constants.PLAYER_SPRITESHEET);
+        }
+
+        // Remove bullets if they go off screen
+        for (int i = 0; i < bullets.size(); ++i) {
+            if (bullets.get(i).hasExpired()) {
+                bullets.remove(bullets.get(i));
+                continue;
+            }
+            // Update bullet movement
+            bullets.get(i).draw(this.batch);
         }
     }
 

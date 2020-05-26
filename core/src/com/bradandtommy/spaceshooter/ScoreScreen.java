@@ -93,6 +93,7 @@ class ScoreScreen implements Screen, InputProcessor {
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.SCOREBOARD_MUSIC_FILENAME));
         menuMusic.setLooping(true);
         menuMusic.play();
+        menuMusic.setVolume(Constants.MUSIC_VOLUME);
 
         // Enable receiving all touch and key input events
         Gdx.input.setInputProcessor(this);
