@@ -45,7 +45,7 @@ public class Bullet {
     public float getHeight() { return sprite.getHeight(); }
 
     public Rectangle getBoundingRectangle() {
-        return new Rectangle(this.getX(), this.getY(), sprite.getWidth(), sprite.getHeight());
+        return new Rectangle(this.getX() + 15, this.getY() + 20, sprite.getWidth() - 30f, sprite.getHeight() - 50);
     }
 
 }

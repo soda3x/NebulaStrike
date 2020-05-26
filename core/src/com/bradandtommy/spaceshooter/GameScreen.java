@@ -152,7 +152,15 @@ class GameScreen implements Screen, InputProcessor {
             sr.begin(ShapeRenderer.ShapeType.Line);
             sr.setColor(Color.RED);
             sr.setAutoShapeType(true);
+            // Get players hitbox
             sr.rect(this.player.getBoundingRectangle().getX(), this.player.getBoundingRectangle().getY(), this.player.getBoundingRectangle().getWidth(), this.player.getBoundingRectangle().getHeight());
+            // Get spawned player bullets hitboxes
+            for (int i = 0; i < player.getSpawnedBullets().size(); ++i) {
+                sr.rect(this.player.getSpawnedBullets().get(i).getBoundingRectangle().getX(),
+                        this.player.getSpawnedBullets().get(i).getBoundingRectangle().getY(),
+                        this.player.getSpawnedBullets().get(i).getBoundingRectangle().getWidth(),
+                        this.player.getSpawnedBullets().get(i).getBoundingRectangle().getHeight());
+            }
             sr.end();
         }
     }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Player {
@@ -193,6 +194,10 @@ public class Player {
         Sprite s = new Sprite(temp[0][0]);
         // 14 and 2.5f are used to tune the hitbox
         return new Rectangle(this.getX() + 20, this.getY() + 22, s.getWidth() / 3f, s.getHeight() / 3f);
+    }
+
+    public ArrayList<Bullet> getSpawnedBullets() {
+        return bullets;
     }
 
 
