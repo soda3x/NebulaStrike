@@ -31,7 +31,7 @@ class ScoreIO {
             String[] stringScores = readFromFile.split("\r\n");
             for (String stringScore : stringScores) {
                 String[] tokenizedScore = stringScore.split(",");
-                Score score = new Score(tokenizedScore[0], Long.parseLong(tokenizedScore[1]), Long.parseLong(tokenizedScore[2]));
+                Score score = new Score(tokenizedScore[0], Integer.parseInt(tokenizedScore[1]), Integer.parseInt(tokenizedScore[2]));
                 scores.add(score);
             }
         } else {

@@ -14,8 +14,14 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	private SpriteBatch batch;
 	private Texture img;
 	private static SpaceShooter instance;
-	private GameScreen gameScreen;
-	private MenuScreen menuScreen;
+
+	// MODIFY BY TOMMY
+	/*private GameScreen gameScreen;
+	private MenuScreen menuScreen;*/
+
+	public static GameScreen gameScreen;
+	public static MenuScreen menuScreen;
+
 	private CreditsScreen creditsScreen;
 	private ScoreScreen scoreScreen;
 
@@ -27,12 +33,10 @@ public class SpaceShooter extends Game implements ApplicationListener {
 		this.create();
 
 		// Create game screen and menu screen
-		gameScreen = new GameScreen();
+		gameScreen = new GameScreen(this);
 		menuScreen = new MenuScreen();
 		creditsScreen = new CreditsScreen();
 		scoreScreen = new ScoreScreen();
-
-
 	}
 
 	/**
