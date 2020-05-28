@@ -122,8 +122,19 @@ public class Player {
             }
         }
 
-        this.setX(velocity.x * deltaTime + getX());
-        this.setY(velocity.y * deltaTime + getY());
+        // ADDED BY TOMMY
+        // Ensure the player is not out of the screen
+        float x = velocity.x * deltaTime + getX();
+        if (x > Gdx.graphics.getWidth() - this.getWidth() ) {
+            x = Gdx.graphics.getWidth() - this.getWidth();
+        }
+        x = (x < 0) ? x = 0 : x;
+
+        float y = velocity.y * deltaTime + getY();
+        if (y > Gdx.graphics.getHeight() - this.getHeight()) {
+            y = Gdx.graphics.getHeight() - this.getHeight();
+        }
+        y = (y < 0) ? y = 0 : y;
 
         this.setX(x);
         this.setY(y);
