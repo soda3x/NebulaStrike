@@ -42,6 +42,7 @@ public class MenuScreen implements Screen, InputProcessor {
      * Create and instantiate necessary objects
      */
     private void create() {
+        Background.getBackgroundInstance().create();
         // Create font for game's name label
         labelFont = new BitmapFont(
                 Gdx.files.internal(Constants.FONT_FONT_FILENAME),
@@ -115,6 +116,8 @@ public class MenuScreen implements Screen, InputProcessor {
         //Set background color and clear the screen
         Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        Background.getBackgroundInstance().update(batch);
 
         batch.begin();
 

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Bullet {
+    // The enum for owner of bullets
+    public enum BulletOwner { PLAYER, ENEMY }
 
     public static final int SPEED = 250;
     private Sprite sprite;
@@ -14,19 +16,31 @@ public class Bullet {
     private boolean expired = false;
     private float time;
 
-    public Bullet(float x, float y, String bulletType) {
+    private BulletOwner owner;
+
+    public Bullet(BulletOwner owner, float x, float y, String bulletType) {
+        this.owner = owner;
         this.x = x;
         this.y = y;
         Texture texture = new Texture(bulletType);
         sprite = new Sprite(texture);
     }
 
+    // MODIFY BY TOMMY
     public void update(float deltaTime) {
-        this.y += SPEED * deltaTime;
-        time -= deltaTime;
-        if (this.y >= Gdx.graphics.getHeight()) {
-            this.expired = true;
+        if (this.owner == BulletOwner.PLAYER) {
+            this.y += SPEED * deltaTime;
+            if (this.y >= Gdx.graphics.getHeight()) {
+                this.expired = true;
+            }
+        } else {
+            this.y -= ((SPEED + Constants.ENEMY_SPEED)  * deltaTime);
+            if (this.y <= 0) {
+                this.expired = true;
+            }
         }
+        time -= deltaTime;
+
     }
 
     public boolean hasExpired() { return expired; }

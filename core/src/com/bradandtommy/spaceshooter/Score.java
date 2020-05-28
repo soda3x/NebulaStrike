@@ -17,12 +17,26 @@ public class Score {
     public String getName() {
         return this.name;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public long getLevel() {
         return this.level;
     }
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public long getScore() {
         return this.score;
+    }
+    public void setScore(int score) { this.score = score; }
+
+    public void addLevel(int value) {
+        this.level += value;
+    }
+    public void addScore(int value) {
+        this.score += value;
     }
 }

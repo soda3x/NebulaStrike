@@ -65,6 +65,7 @@ public class Button {
         this.textureUp = textureUp;
         this.textureDown = textureDown;
 
+
         this.textLabel = null;
 
         this.sound = null;

@@ -30,7 +30,8 @@ public class Player {
     private Vector2 velocity;
     private boolean hasFired;
 
-    private ArrayList<Bullet> bullets;
+    // MODIFIED BY TOMMY
+    public ArrayList<Bullet> bullets;
 
     private long timeElapsedSinceLastCalled;
 
@@ -152,7 +153,8 @@ public class Player {
             if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= shootCooldownMillis) {
                 timeElapsedSinceLastCalled = timeElapsedWhenCalled;
                 initSprite(Constants.PLAYER_SPRITESHEET_ALT);
-                bullets.add(new Bullet(this.getX(), this.getY(), Constants.PLAYER_BULLET));
+                // ADDED parameter
+                bullets.add(new Bullet(Bullet.BulletOwner.PLAYER, this.getX(), this.getY(), Constants.PLAYER_BULLET));
             }
         } else {
             initSprite(Constants.PLAYER_SPRITESHEET);

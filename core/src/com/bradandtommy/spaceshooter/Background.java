@@ -8,76 +8,43 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Background {
-    private SpriteBatch batch;
-    private Sprite sprite;
-    private Texture bgSheet;
-    private Animation bgAnimation;
-    private float stateTime;
 
-    private float x, y;
+    private Texture bg1, bg2;
+    private float yMax, yCoordBg1, yCoordBg2;
+    private final int BG_MOVE_SPEED = 200;
+    private static Background instance;
 
-    private static final int ROWS = 4;
-    private static final int COLUMNS = 3;
-    private static final float FRAME_DURATION = 0.120f;
+    private Background() {
+        this.create();
+    }
 
-    public Background() {
-        this.batch = new SpriteBatch();
-        this.sprite = new Sprite();
-        bgSheet = new Texture(Gdx.files.internal("sprites/Background.png"));
-
-        TextureRegion[][] temp = TextureRegion.split(bgSheet, bgSheet.getWidth() / COLUMNS, bgSheet.getHeight() / ROWS);
-        TextureRegion[] bgFrames = new TextureRegion[ROWS * COLUMNS];
-        int index = 0;
-        for (int i = 0; i < ROWS; ++i) {
-            for (int j = 0; j < COLUMNS; ++j) {
-                bgFrames[index++] = temp[i][j];
-            }
+    public static Background getBackgroundInstance() {
+        if (instance == null) {
+            instance = new Background();
         }
-        bgAnimation = new Animation<TextureRegion>(FRAME_DURATION, bgFrames);
+        return instance;
     }
 
-    public void setPos(OrthographicCamera camera, float x, float y) {
-        this.setX(camera.position.x - x);
-        this.setY(camera.position.y - y);
+
+    public void create() {
+        this.bg1 = new Texture(Gdx.files.internal(Constants.SCROLLING_BG_IMAGE));
+        this.bg2 = new Texture(Gdx.files.internal(Constants.SCROLLING_BG_IMAGE));
+        this.yMax = 480;
+        this.yCoordBg1 = 0;
+        this.yCoordBg2 = yMax;
     }
 
-    public float getX() {
-        return x;
-    }
+    public void update(SpriteBatch batch) {
+        yCoordBg1 -= BG_MOVE_SPEED * Gdx.graphics.getDeltaTime();
+        yCoordBg2 = yCoordBg1 - yMax;  // We move the background, not the camera
+        if (yCoordBg1 < 0) {
+            yCoordBg1 = yMax;
+            yCoordBg2 = 0;
+        }
 
-    public float getY() {
-        return y;
-    }
-
-    public float getWidth() {
-        TextureRegion[][] temp = TextureRegion.split(bgSheet, bgSheet.getWidth() / COLUMNS, bgSheet.getHeight() / ROWS);
-        Sprite s = new Sprite(temp[0][0]);
-        return s.getWidth();
-    }
-
-    public float getHeight() {
-        TextureRegion[][] temp = TextureRegion.split(bgSheet, bgSheet.getWidth() / COLUMNS, bgSheet.getHeight() / ROWS);
-        Sprite s = new Sprite(temp[0][0]);
-        return s.getHeight();
-    }
-
-    public void setX(float newX) {
-        this.x = newX;
-    }
-
-    public void setY(float newY) {
-        this.y = newY;
-    }
-
-    public void draw() {
         batch.begin();
-        stateTime += Gdx.graphics.getDeltaTime();
-        this.sprite = render(stateTime);
-        batch.draw(sprite, this.getX(), this.getY());
+        batch.draw(bg1, 0, yCoordBg1);
+        batch.draw(bg2, 0, yCoordBg2);
         batch.end();
-    }
-
-    public Sprite render(float stateTime) {
-        return new Sprite((TextureRegion) bgAnimation.getKeyFrame(stateTime, true));
     }
 }

@@ -14,6 +14,7 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	private SpriteBatch batch;
 	private Texture img;
 	private static SpaceShooter instance;
+
 	private GameScreen gameScreen;
 	private MenuScreen menuScreen;
 	private CreditsScreen creditsScreen;
@@ -31,8 +32,6 @@ public class SpaceShooter extends Game implements ApplicationListener {
 		menuScreen = new MenuScreen();
 		creditsScreen = new CreditsScreen();
 		scoreScreen = new ScoreScreen();
-
-
 	}
 
 	/**
