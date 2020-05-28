@@ -15,13 +15,8 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	private Texture img;
 	private static SpaceShooter instance;
 
-	// MODIFY BY TOMMY
-	/*private GameScreen gameScreen;
-	private MenuScreen menuScreen;*/
-
-	public static GameScreen gameScreen;
-	public static MenuScreen menuScreen;
-
+	private GameScreen gameScreen;
+	private MenuScreen menuScreen;
 	private CreditsScreen creditsScreen;
 	private ScoreScreen scoreScreen;
 
@@ -33,7 +28,7 @@ public class SpaceShooter extends Game implements ApplicationListener {
 		this.create();
 
 		// Create game screen and menu screen
-		gameScreen = new GameScreen(this);
+		gameScreen = new GameScreen();
 		menuScreen = new MenuScreen();
 		creditsScreen = new CreditsScreen();
 		scoreScreen = new ScoreScreen();

@@ -28,24 +28,15 @@ class GameScreen implements Screen, InputProcessor {
     // The enum for states of the game
     public enum GameState { PLAYING, FAIL, PAUSE };
 
-    //Having a static reference to this central class
-    public static GameScreen global;
-    // Main Game class
-    private SpaceShooter game;
-
     private SpriteBatch batch;
     private Skin skin;
     private Stage stage;
     private OrthographicCamera camera;
     private Player player;
-    private Background bg;
     private Music initial;
     private Music bgm;
     private boolean showHitboxes = false;
     private InputPoller input;
-    private Texture bg1, bg2;
-    float yMax, yCoordBg1, yCoordBg2;
-    final int BG_MOVE_SPEED = 200;
     private Score score;
     private int lives;
     private long timeElapsed;
@@ -67,15 +58,8 @@ class GameScreen implements Screen, InputProcessor {
 
     private ArrayList<Enemy> enemies;
 
-    // ADDED BY TOMMY
-    public GameScreen(SpaceShooter game) {
-        global = this;
-        this.game = game;
-    }
-
     private void create() {
         gameState = GameState.PLAYING;
-        score = new Score();
         score.setLevel(1);
         score.setScore(0);
         lives = 3;
@@ -105,15 +89,11 @@ class GameScreen implements Screen, InputProcessor {
         camera.setToOrtho(false, w, h);
 
         this.player = new Player();
-        this.bg = new Background();
         player.setPos(camera, player.getWidth() / 2, 200);
-        bg.setPos(camera, bg.getWidth() / 2, bg.getHeight() / 2);
 
-        // ADDED BY TOMMY
         this.enemies = new ArrayList<Enemy>();
 
         // Buttons
-        //------------------------------------
         Texture buttonLongTexture;
         Texture buttonLongDownTexture;
         buttonLongTexture = new Texture(Constants.BUTTON_LONG_UP_TEXTURE_FILENAME);
@@ -137,13 +117,8 @@ class GameScreen implements Screen, InputProcessor {
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
-        bg1 = new Texture(Gdx.files.internal("sprites/Background_alt.png"));
-        bg2 = new Texture(Gdx.files.internal("sprites/Background_alt.png"));
-        yMax = 480;
-        yCoordBg1 = 0;
-        yCoordBg2 = yMax;
+        Background.getBackgroundInstance().create();
 
-        // ADDED BY TOMMY
         // Set the buttons' state to up
         backToMenuButton.isDown = false;
         resumeButton.isDown = false;
@@ -159,39 +134,27 @@ class GameScreen implements Screen, InputProcessor {
 
     public void render(float deltaTime) {
 
-        // ADDED BY TOMMY
-        updatePause();
+        this.updatePause();
         if (gameState == GameState.PAUSE) {
             // Pause background music and present the PAUSED
-            //backgroundMusic.pause();
-            drawPaused(batch);
+            initial.setVolume(0.0f);
+            bgm.setVolume(0.0f);
+            this.drawPaused();
             return;
         }
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // ADDED BY TOMMY
         // Set current game state to PLAYING
         gameState = GameState.PLAYING;
 
         // Scrolling Background
-        yCoordBg1 -= BG_MOVE_SPEED * deltaTime;
-        yCoordBg2 = yCoordBg1 - yMax;  // We move the background, not the camera
-        if (yCoordBg1 < 0) {
-            yCoordBg1 = yMax;
-            yCoordBg2 = 0;
-        }
+        Background.getBackgroundInstance().update(batch);
 
-        batch.begin();
-        batch.draw(bg1, 0, yCoordBg1);
-        batch.draw(bg2, 0, yCoordBg2);
-        batch.end();
-
-        // ADDED BY TOMMY
-        if (enemies.size() > 0) {
-            for (Enemy enemy : enemies) {
-                enemy.draw(batch);
+        if (!enemies.isEmpty()) {
+            for (int i = 0; i < enemies.size(); ++i) {
+                enemies.get(i).draw(batch);
             }
         }
 
@@ -272,30 +235,27 @@ class GameScreen implements Screen, InputProcessor {
             backToMenuActive = true;
         } else if (resumeButton.isDown) {
             resumeActive = true;
+
         } else if (backToMenuActive) {
-            game.setScreen(game.getMenuScreen());
-            return;
+            SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getMenuScreen());
         } else if (resumeActive) {
             //isBackKeyPressed = false;
             resumeActive = false;
             backToMenuActive = false;
-
+            initial.setVolume(Constants.MUSIC_VOLUME);
+            bgm.setVolume(Constants.MUSIC_VOLUME);
             //backgroundMusic.play();
             gameState = GameState.PLAYING;
         }
     }
 
+    private boolean gameIsPaused() {
+        return pauseActive || pauseButton.isDown;
+    }
+
     private void update(float deltaTime) {
 
-        // ADDED BY TOMMY
-        if (pauseButton.isDown) {
-            pauseActive = true;
-            return;
-        } else if (pauseActive) {
-            pauseActive = false;
-            gameState = GameState.PAUSE;
-            return;
-        }
+        if (gameIsPaused()) gameState = GameState.PAUSE;
 
         // Get amount of time game has been on GameScreen so we can calculate things such as when to fire next bullet
         this.timeElapsed = System.currentTimeMillis();
@@ -341,7 +301,7 @@ class GameScreen implements Screen, InputProcessor {
         player.move(deltaTime);
         player.update(timeElapsed);
 
-        // Spawn enemy - ADDDED BY TOMMY
+        // Spawn enemy
         if (enemies.size() < 10) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
@@ -365,9 +325,10 @@ class GameScreen implements Screen, InputProcessor {
 
     /**
      * Draw the pause message along with the Continue and Quit buttons
-     * @param batch sprite batch
      */
-    public void drawPaused(SpriteBatch batch) {
+    public void drawPaused() {
+        Background.getBackgroundInstance().update(batch);
+
         batch.begin();
 
         // Font
@@ -394,15 +355,19 @@ class GameScreen implements Screen, InputProcessor {
         // Draw Resume button with "TRY AGAIN" label
         resumeButton.setX(x);
         resumeButton.setY(y - (Constants.BUTTON_HEIGHT + Constants.BUTTON_SPACING));
-        resumeButton.setText(buttonFont, "CONTINUE", Label.Alignment.CENTER, Label.Alignment.CENTER);
+        resumeButton.setText(buttonFont, "Continue", Label.Alignment.CENTER, Label.Alignment.CENTER);
         resumeButton.draw(batch);
 
         // Draw Quit button
         backToMenuButton.setX(x);
         backToMenuButton.setY(y - 2 * (Constants.BUTTON_HEIGHT + Constants.BUTTON_SPACING));
-        backToMenuButton.setText(buttonFont, "BACK TO MENU", Label.Alignment.CENTER, Label.Alignment.CENTER);
+        backToMenuButton.setText(buttonFont, "Back To Menu", Label.Alignment.CENTER, Label.Alignment.CENTER);
         backToMenuButton.draw(batch);
         batch.end();
+    }
+
+    private void drawScrollingBg() {
+        // Scrolling Background
     }
 
     @Override
@@ -472,6 +437,10 @@ class GameScreen implements Screen, InputProcessor {
             case PAUSE:
                 // Check if the resumeButton or quitButton is down based on the touched point's coordinate
                 resumeButton.update(true, screenX, screenY);
+                if (resumeButton.isDown) {
+                    pauseActive = false;
+                    pauseButton.isDown = false;
+                }
                 backToMenuButton.update(true, screenX, screenY);
                 break;
         }

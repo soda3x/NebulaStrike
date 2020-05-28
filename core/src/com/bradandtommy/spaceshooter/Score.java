@@ -4,18 +4,11 @@ package com.bradandtommy.spaceshooter;
  * Data type to contain a score and relevant extra data
  */
 public class Score {
-    // MODIFIED BY TOMMY
     private String name;
-    private int level;
-    private int score;
+    private long level;
+    private long score;
 
-    public Score() {
-        this.name = "";
-        this.level = 0;
-        this.score = 0;
-    }
-
-    public Score(String name, int level, int score) {
+    public Score(String name, long level, long score) {
         this.name = name;
         this.level = level;
         this.score = score;
@@ -28,14 +21,14 @@ public class Score {
         this.name = name;
     }
 
-    public int getLevel() {
+    public long getLevel() {
         return this.level;
     }
     public void setLevel(int level) {
         this.level = level;
     }
 
-    public int getScore() {
+    public long getScore() {
         return this.score;
     }
     public void setScore(int score) { this.score = score; }

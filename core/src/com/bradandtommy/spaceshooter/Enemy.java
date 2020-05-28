@@ -160,12 +160,6 @@ public class Enemy {
     }
 
     public boolean hasFired() {
-        /*
-        GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
-        if (g.getInputPoller().shoot.isDown) {
-            hasFired = true;
-        }
-         */
         return hasFired;
     }
 
