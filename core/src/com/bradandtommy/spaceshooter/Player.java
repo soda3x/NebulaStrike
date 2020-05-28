@@ -125,6 +125,9 @@ public class Player {
         this.setX(velocity.x * deltaTime + getX());
         this.setY(velocity.y * deltaTime + getY());
 
+        this.setX(x);
+        this.setY(y);
+
         // Friction
         if (Math.abs(velocity.len2()) < 0.01f) {
             /* Floating-point numbers are very inaccurate and will rarely hit absolute

@@ -13,11 +13,24 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 
 public class Enemy {
+
+    // ADDED BY TOMMY
+    // The enum for enemy kinds
+    public enum EnemyKind { NORMAL, BOSS, BOUNTY }
+
     private Sprite sprite;
     private Texture enemySheet;
     private Animation enemyAnimation;
     private TextureRegion[] enemyFrames;
     private float stateTime;
+
+    // ADDED BY TOMMY
+    private Animation shootingAnimation;
+    private TextureRegion[] shootingFrames;
+    private Animation noShootingAnimation;
+    private TextureRegion[] noShootingFrames;
+    public EnemyKind enemykind;
+
 
     public boolean dead = false;
 
@@ -32,17 +45,25 @@ public class Enemy {
 
     public ArrayList<Bullet> bullets;
 
-    public Enemy() {
+    public Enemy(EnemyKind enemykind) {
+        // ADDED BY TOMMY - including the parameter
+        this.enemykind = enemykind;
+
         this.movement = new Vector2();
         this.velocity = new Vector2();
         this.sprite = new Sprite();
         this.dead = false;
-        this.initSprite(Constants.ENEMY_SPRITESHEET);
+
+        // REPLACED BY TOMMY
+        //this.initSprite(Constants.ENEMY_SPRITESHEET);
+        this.initSprite();
+        this.switchSprite(false);
+
         this.bullets = new ArrayList<Bullet>();
         stateTime = 0.0f;
     }
 
-    public void initSprite(String spriteFilePath) {
+    /*public void initSprite(String spriteFilePath) {
         enemySheet = new Texture(Gdx.files.internal(spriteFilePath));
 
         TextureRegion[][] temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
@@ -55,6 +76,74 @@ public class Enemy {
             }
         }
         enemyAnimation = new Animation<TextureRegion>(FRAME_DURATION, enemyFrames);
+    }*/
+
+    // REPLACE BY TOMMY - the old init with this new init
+    public void initSprite() {
+        String textureSheetPath = "";
+
+        /**
+         * Build no shooting frames
+         */
+        switch (enemykind) {
+            case NORMAL:
+                textureSheetPath = Constants.ENEMY_NORMAL_SPRITESHEET;
+                break;
+            case BOSS:
+                textureSheetPath = Constants.ENEMY_BOSS_SPRITESHEET;
+                break;
+            case BOUNTY:
+                textureSheetPath = Constants.ENEMY_BOUNTY_SPRITESHEET;
+                break;
+        }
+        Texture enemySheet = new Texture(Gdx.files.internal(textureSheetPath));
+        TextureRegion[][] temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
+        noShootingFrames = new TextureRegion[ROWS * COLUMNS];
+        int index = 0;
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
+                noShootingFrames[index++] = temp[i][j];
+            }
+        }
+        noShootingAnimation = new Animation<TextureRegion>(FRAME_DURATION, noShootingFrames);
+
+        /**
+         * Build shooting frames
+         */
+        switch (enemykind) {
+            case NORMAL:
+                textureSheetPath = Constants.ENEMY_NORMAL_SPRITESHEET_ALT;
+                break;
+            case BOSS:
+                textureSheetPath = Constants.ENEMY_BOSS_SPRITESHEET_ALT;
+                break;
+            case BOUNTY:
+                textureSheetPath = Constants.ENEMY_BOUNTY_SPRITESHEET_ALT;
+                break;
+        }
+        enemySheet = new Texture(Gdx.files.internal(textureSheetPath));
+        temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
+        shootingFrames = new TextureRegion[ROWS * COLUMNS];
+        index = 0;
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
+                shootingFrames[index++] = temp[i][j];
+            }
+        }
+        shootingAnimation = new Animation<TextureRegion>(FRAME_DURATION, shootingFrames);
+
+        enemySheet.dispose();
+    }
+
+    // ADDED BY TOMMY - switch frames
+    public void switchSprite(Boolean isShooting) {
+        if (isShooting) {
+            enemyFrames = shootingFrames;
+            enemyAnimation = shootingAnimation;
+        } else {
+            enemyFrames = noShootingFrames;
+            enemyAnimation = noShootingAnimation;
+        }
     }
 
 
@@ -103,6 +192,14 @@ public class Enemy {
 
         //movement.set(0f, 0f);
         movement.y -= 1;
+
+        // ADDED BY TOMMY - enemies move toward to player
+        if (this.x > g.getPlayer().getX()) {
+            movement.x -= 1;
+        } else if (this.x < g.getPlayer().getX()) {
+            movement.x += 1;
+        }
+
         if (movement.len2() > 1.0f) movement.nor();
 
         //Acceleration
@@ -146,16 +243,19 @@ public class Enemy {
         int rnd = MathUtils.random(1,100);
         if (rnd == 50) {
             hasFired = true;
-            initSprite(Constants.ENEMY_SPRITESHEET_ALT);
+            switchSprite(true);
             bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET));
-            for (int i = 0; i < bullets.size(); ++i) {
+            for (int i = 0; i < bullets.size(); i++) {
                 if (bullets.get(i).hasExpired()) {
-                    bullets.remove(bullets.get(i));
+
+                    //bullets.remove(bullets.get(i));
+                    Bullet bullet = bullets.remove(i);
+                    //bullet.dispose();
                     continue;
                 }
             }
         } else {
-            initSprite(Constants.ENEMY_SPRITESHEET);
+            switchSprite(false);
         }
     }
 
