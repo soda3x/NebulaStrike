@@ -35,6 +35,7 @@ class ScoreScreen implements Screen, InputProcessor {
     private ScoreIO scores;
 
     private void create() {
+        Background.getBackgroundInstance().create();
         // Font for name label and button
         BitmapFont labelFont = new BitmapFont(
                 Gdx.files.internal(Constants.FONT_FONT_FILENAME),
@@ -141,6 +142,8 @@ class ScoreScreen implements Screen, InputProcessor {
         //Set background color and clear the screen
         Gdx.gl.glClearColor(135/255f, 206/255f, 235/255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        Background.getBackgroundInstance().update(batch);
 
         batch.begin();
 

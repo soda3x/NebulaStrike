@@ -28,8 +28,12 @@ class ScoreIO {
         if (handle.exists()) {
             Gdx.app.log("DEBUG", "Scores file found");
             String readFromFile = handle.readString();
-            Gdx.app.log("SYSTEM", System.getProperty("os.name"));
-            String[] stringScores = readFromFile.split("\n");
+            String[] stringScores;
+            if (System.getProperty("os.name").contains("Windows")) {
+                stringScores = readFromFile.split("\r\n");
+            } else {
+                stringScores = readFromFile.split("\n");
+            }
             for (String stringScore : stringScores) {
                 String[] tokenizedScore = stringScore.split(",");
                 Score score = new Score(tokenizedScore[0], Long.parseLong(tokenizedScore[1]), Long.parseLong(tokenizedScore[2]));

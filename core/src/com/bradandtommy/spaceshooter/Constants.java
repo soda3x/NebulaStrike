@@ -3,10 +3,10 @@ package com.bradandtommy.spaceshooter;
 public class Constants {
     // The constants for the buttons
     public static final String BUTTON_LONG_UP_TEXTURE_FILENAME = "buttonLong_blue.png";
-    public static final String BUTTON_LONG_DOWN_TEXTURE_FILENAME = "buttonLong_beige_pressed.png";
+    public static final String BUTTON_LONG_DOWN_TEXTURE_FILENAME = "buttonLong_blue.png";
     public static final float BUTTON_WIDTH = 160f;
     public static final float BUTTON_HEIGHT = 80f;
-    public static final float BUTTON_SPACING = 10f;
+    public static final float BUTTON_SPACING = 5f;
 
     // The constants for scrolling background
     public static final String SCROLLING_BG_IMAGE = "sprites/Background_alt.png";

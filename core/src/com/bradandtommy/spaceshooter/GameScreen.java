@@ -37,7 +37,8 @@ class GameScreen implements Screen, InputProcessor {
     private Music bgm;
     private boolean showHitboxes = false;
     private InputPoller input;
-    private Score score;
+    private long scoreCounter;
+    private long levelCounter;
     private int lives;
     private long timeElapsed;
 
@@ -60,8 +61,6 @@ class GameScreen implements Screen, InputProcessor {
 
     private void create() {
         gameState = GameState.PLAYING;
-        score.setLevel(1);
-        score.setScore(0);
         lives = 3;
         input = new InputPoller();
         float w = Gdx.graphics.getWidth();
@@ -185,11 +184,11 @@ class GameScreen implements Screen, InputProcessor {
         hudFont.getData().setScale(1, 1);
         hudFont.setColor(1f, 1f, 1f, 1f);
 
-        Label runningScore = new Label(hudFont, "Score: " + score.getScore(),
+        Label runningScore = new Label(hudFont, "Score: " + scoreCounter,
                 (camera.position.x) + 100f,Gdx.graphics.getHeight() - Constants.BUTTON_HEIGHT, 100f, Constants.BUTTON_HEIGHT,
                 Label.Alignment.RIGHT, Label.Alignment.CENTER);
 
-        Label runningLevel = new Label(hudFont, "Level: " + score.getLevel(),
+        Label runningLevel = new Label(hudFont, "Level: " + levelCounter,
                 (camera.position.x / 2) - 100f, Gdx.graphics.getHeight() - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
                 Label.Alignment.LEFT, Label.Alignment.CENTER);
 
@@ -289,7 +288,7 @@ class GameScreen implements Screen, InputProcessor {
                 for (Bullet pyBullet : player.bullets) {
                     if (pyBullet.getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
                         enemy.dead = true;
-                        score.addScore(50);
+                        scoreCounter += 50;
                     }
                 }
             }
