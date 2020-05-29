@@ -119,8 +119,16 @@ public class Player {
             }
         }
 
-        this.setX(velocity.x * deltaTime + getX());
-        this.setY(velocity.y * deltaTime + getY());
+        // Ensure the player is not out of the screen
+        float tempX = velocity.x * deltaTime + getX();
+        float tempY = velocity.y * deltaTime + getY();
+
+        if (tempX < Gdx.graphics.getWidth() - this.getWidth() && tempX > 0) {
+            this.setX(velocity.x * deltaTime + getX());
+        }
+        if (tempY < Gdx.graphics.getHeight() - this.getHeight() && tempY > 0) {
+            this.setY(velocity.y * deltaTime + getY());
+        }
 
         // Friction
         if (Math.abs(velocity.len2()) < 0.01f) {
