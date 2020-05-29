@@ -26,7 +26,6 @@ public class Bullet {
         sprite = new Sprite(texture);
     }
 
-    // MODIFY BY TOMMY
     public void update(float deltaTime) {
         if (this.owner == BulletOwner.PLAYER) {
             this.y += SPEED * deltaTime;

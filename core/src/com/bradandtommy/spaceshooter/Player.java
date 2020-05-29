@@ -19,8 +19,6 @@ public class Player {
     private Animation playerAnimation;
     private float stateTime;
 
-    private boolean dead = false;
-
     private static final int ROWS = 3;
     private static final int COLUMNS = 3;
     private static final float FRAME_DURATION = 0.033f;
@@ -28,17 +26,16 @@ public class Player {
     private float x, y;
     private Vector2 movement;
     private Vector2 velocity;
+
     private boolean hasFired;
+    private boolean dead;
 
-    // MODIFIED BY TOMMY
     public ArrayList<Bullet> bullets;
-
     private long timeElapsedSinceLastCalled;
-
     private final long shootCooldownMillis = 300;
 
-
     public Player() {
+        this.dead = false;
         this.batch = new SpriteBatch();
         this.movement = new Vector2();
         this.velocity = new Vector2();
@@ -125,9 +122,6 @@ public class Player {
         this.setX(velocity.x * deltaTime + getX());
         this.setY(velocity.y * deltaTime + getY());
 
-        this.setX(x);
-        this.setY(y);
-
         // Friction
         if (Math.abs(velocity.len2()) < 0.01f) {
             /* Floating-point numbers are very inaccurate and will rarely hit absolute
@@ -162,7 +156,6 @@ public class Player {
         } else {
             initSprite(Constants.PLAYER_SPRITESHEET);
         }
-
         // Remove bullets if they go off screen
         for (int i = 0; i < bullets.size(); ++i) {
             if (bullets.get(i).hasExpired()) {
@@ -197,7 +190,6 @@ public class Player {
     public Rectangle getBoundingRectangle() {
         TextureRegion[][] temp = TextureRegion.split(playerSheet, playerSheet.getWidth() / COLUMNS, playerSheet.getHeight() / ROWS);
         Sprite s = new Sprite(temp[0][0]);
-        // 14 and 2.5f are used to tune the hitbox
         return new Rectangle(this.getX() + 20, this.getY() + 22, s.getWidth() / 3f, s.getHeight() / 3f);
     }
 

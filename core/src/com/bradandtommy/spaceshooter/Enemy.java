@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 public class Enemy {
 
-    // ADDED BY TOMMY
-    // The enum for enemy kinds
     public enum EnemyKind { NORMAL, BOSS, BOUNTY }
 
     private Sprite sprite;
@@ -24,7 +22,6 @@ public class Enemy {
     private TextureRegion[] enemyFrames;
     private float stateTime;
 
-    // ADDED BY TOMMY
     private Animation shootingAnimation;
     private TextureRegion[] shootingFrames;
     private Animation noShootingAnimation;
@@ -46,7 +43,6 @@ public class Enemy {
     public ArrayList<Bullet> bullets;
 
     public Enemy(EnemyKind enemykind) {
-        // ADDED BY TOMMY - including the parameter
         this.enemykind = enemykind;
 
         this.movement = new Vector2();
@@ -54,8 +50,6 @@ public class Enemy {
         this.sprite = new Sprite();
         this.dead = false;
 
-        // REPLACED BY TOMMY
-        //this.initSprite(Constants.ENEMY_SPRITESHEET);
         this.initSprite();
         this.switchSprite(false);
 
@@ -63,40 +57,18 @@ public class Enemy {
         stateTime = 0.0f;
     }
 
-    /*public void initSprite(String spriteFilePath) {
-        enemySheet = new Texture(Gdx.files.internal(spriteFilePath));
-
-        TextureRegion[][] temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
-        enemyFrames = new TextureRegion[ROWS * COLUMNS];
-        int index = 0;
-        for (int i = 0; i < ROWS; ++i) {
-            for (int j = 0; j < COLUMNS; ++j) {
-                //temp[i][j].flip(false, true);
-                enemyFrames[index++] = temp[i][j];
-            }
-        }
-        enemyAnimation = new Animation<TextureRegion>(FRAME_DURATION, enemyFrames);
-    }*/
-
-    // REPLACE BY TOMMY - the old init with this new init
     public void initSprite() {
-        String textureSheetPath = "";
-
-        /**
-         * Build no shooting frames
-         */
         switch (enemykind) {
             case NORMAL:
-                textureSheetPath = Constants.ENEMY_NORMAL_SPRITESHEET;
+                enemySheet = new Texture(Constants.ENEMY_NORMAL_SPRITESHEET);
                 break;
             case BOSS:
-                textureSheetPath = Constants.ENEMY_BOSS_SPRITESHEET;
+                enemySheet = new Texture(Constants.ENEMY_BOSS_SPRITESHEET);
                 break;
             case BOUNTY:
-                textureSheetPath = Constants.ENEMY_BOUNTY_SPRITESHEET;
+                enemySheet = new Texture(Constants.ENEMY_BOUNTY_SPRITESHEET);
                 break;
         }
-        Texture enemySheet = new Texture(Gdx.files.internal(textureSheetPath));
         TextureRegion[][] temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
         noShootingFrames = new TextureRegion[ROWS * COLUMNS];
         int index = 0;
@@ -112,16 +84,15 @@ public class Enemy {
          */
         switch (enemykind) {
             case NORMAL:
-                textureSheetPath = Constants.ENEMY_NORMAL_SPRITESHEET_ALT;
+                enemySheet = new Texture(Constants.ENEMY_NORMAL_SPRITESHEET_ALT);
                 break;
             case BOSS:
-                textureSheetPath = Constants.ENEMY_BOSS_SPRITESHEET_ALT;
+                enemySheet = new Texture(Constants.ENEMY_BOSS_SPRITESHEET_ALT);
                 break;
             case BOUNTY:
-                textureSheetPath = Constants.ENEMY_BOUNTY_SPRITESHEET_ALT;
+                enemySheet = new Texture(Constants.ENEMY_BOUNTY_SPRITESHEET);
                 break;
         }
-        enemySheet = new Texture(Gdx.files.internal(textureSheetPath));
         temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
         shootingFrames = new TextureRegion[ROWS * COLUMNS];
         index = 0;
@@ -135,7 +106,6 @@ public class Enemy {
         enemySheet.dispose();
     }
 
-    // ADDED BY TOMMY - switch frames
     public void switchSprite(Boolean isShooting) {
         if (isShooting) {
             enemyFrames = shootingFrames;
@@ -193,7 +163,7 @@ public class Enemy {
         //movement.set(0f, 0f);
         movement.y -= 1;
 
-        // ADDED BY TOMMY - enemies move toward to player
+        // enemies move toward to player
         if (this.x > g.getPlayer().getX()) {
             movement.x -= 1;
         } else if (this.x < g.getPlayer().getX()) {
@@ -202,7 +172,7 @@ public class Enemy {
 
         if (movement.len2() > 1.0f) movement.nor();
 
-        //Acceleration
+        // Acceleration
         if (movement.len2() > 0.1f) {
             if (movement.len2() > 1.0f) movement.nor();
             float speed = Constants.ENEMY_SPEED;
@@ -247,10 +217,7 @@ public class Enemy {
             bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET));
             for (int i = 0; i < bullets.size(); i++) {
                 if (bullets.get(i).hasExpired()) {
-
-                    //bullets.remove(bullets.get(i));
-                    Bullet bullet = bullets.remove(i);
-                    //bullet.dispose();
+                    bullets.remove(bullets.get(i));
                     continue;
                 }
             }

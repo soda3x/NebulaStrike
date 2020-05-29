@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 class GameScreen implements Screen, InputProcessor {
 
-    // ADDED BY TOMMY
     // The enum for states of the game
     public enum GameState { PLAYING, FAIL, PAUSE };
 
@@ -42,9 +41,6 @@ class GameScreen implements Screen, InputProcessor {
     private int lives;
     private long timeElapsed;
 
-    // ADDED BY TOMMY
-
-
     //Buttons
     private Button backToMenuButton;
     private Button resumeButton;
@@ -59,15 +55,6 @@ class GameScreen implements Screen, InputProcessor {
     public GameState gameState;
 
     private ArrayList<Enemy> enemies;
-
-    // ADDED BY TOMMY
-    public Player getPlayer() {
-        return this.player;
-    }
-
-    public OrthographicCamera getCamera() {
-        return this.camera;
-    }
 
     private void create() {
         gameState = GameState.PLAYING;
@@ -147,7 +134,7 @@ class GameScreen implements Screen, InputProcessor {
 
         this.updatePause();
         if (gameState == GameState.PAUSE) {
-            // Pause background music and present the PAUSED
+            // Pause background music and present the Pause screen
             initial.setVolume(0.0f);
             bgm.setVolume(0.0f);
             this.drawPaused();
@@ -208,8 +195,6 @@ class GameScreen implements Screen, InputProcessor {
                 (camera.position.x / 2) - 100f, (camera.position.y / 2) - 125f, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
                 Label.Alignment.LEFT, Label.Alignment.CENTER);
 
-        //pauseButton.draw(uiBatch);
-
         batch.begin();
         runningScore.draw(batch);
         runningLevel.draw(batch);
@@ -265,7 +250,6 @@ class GameScreen implements Screen, InputProcessor {
     private void update(float deltaTime) {
 
         if (gameIsPaused()) gameState = GameState.PAUSE;
-
         // Get amount of time game has been on GameScreen so we can calculate things such as when to fire next bullet
         this.timeElapsed = System.currentTimeMillis();
 
@@ -273,7 +257,6 @@ class GameScreen implements Screen, InputProcessor {
 
         camera.update();
 
-        // ADDED BY TOMMY
         for(int i = enemies.size() - 1; i >= 0; i--){
             Enemy enemy = enemies.get(i);
             if (enemy.getY() <= 0) {
@@ -297,8 +280,7 @@ class GameScreen implements Screen, InputProcessor {
                     if (player.bullets.get(k).getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
                         enemy.dead = true;
 
-                        // ADDED BY TOMMY
-                        //scoreCounter += 50;
+                        // Calculate score and life
                         switch (enemy.enemykind) {
                             case NORMAL:
                                 scoreCounter += 50;
@@ -321,38 +303,30 @@ class GameScreen implements Screen, InputProcessor {
             }
             if (enemy.isDead()) {
                 enemies.remove(i);
-                //enemy.dispose();
             }
         }
 
         player.move(deltaTime);
         player.update(timeElapsed);
 
-        // REPLACED BY TOMMY
         // Spawn enemy
         if (enemies.size() < 10) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
-                Enemy newenemy;
-                //Enemy enemy = new Enemy();
+                Enemy newEnemy;
                 rnd = MathUtils.random(1, 100);
-                switch (rnd) {
-                    case 33:
-                        newenemy = new Enemy(Enemy.EnemyKind.BOSS);
-                        break;
-                    case 66:
-                        newenemy = new Enemy(Enemy.EnemyKind.BOUNTY);
-                        break;
-                    default:
-                        newenemy = new Enemy(Enemy.EnemyKind.NORMAL);
-                        break;
+                if (rnd <= Constants.SPAWN_RATE_BOSS) {
+                    newEnemy = new Enemy(Enemy.EnemyKind.BOSS);
+                } else if (rnd < Constants.SPAWN_RATE_BOUNTY) {
+                    newEnemy = new Enemy(Enemy.EnemyKind.BOUNTY);
+                } else {
+                    newEnemy = new Enemy(Enemy.EnemyKind.NORMAL);
                 }
 
-
-                float enemyStartX = MathUtils.random(camera.position.x - newenemy.getWidth() / 2, camera.position.x - camera.viewportWidth + newenemy.getWidth());
+                float enemyStartX = MathUtils.random(camera.position.x - newEnemy.getWidth() / 2, camera.position.x - camera.viewportWidth + newEnemy.getWidth());
                 float enemyStartY = camera.position.y - camera.viewportHeight;
-                newenemy.setPos(camera, enemyStartX, enemyStartY);
-                enemies.add(newenemy);
+                newEnemy.setPos(camera, enemyStartX, enemyStartY);
+                enemies.add(newEnemy);
             }
         }
 
@@ -409,14 +383,9 @@ class GameScreen implements Screen, InputProcessor {
         batch.end();
     }
 
-    private void drawScrollingBg() {
-        // Scrolling Background
-    }
-
     @Override
     public void dispose() {
         batch.dispose();
-        //player.dispose();
         initial.dispose();
         bgm.dispose();
         backToMenuButton.dispose();
@@ -424,7 +393,6 @@ class GameScreen implements Screen, InputProcessor {
         pauseButton.dispose();
         for (int i = enemies.size() - 1; i >= 0; i--) {
             Enemy enemy = enemies.remove(i);
-            //enemy.dispose();
         }
     }
 
@@ -475,12 +443,8 @@ class GameScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         switch (gameState) {
             case PLAYING:
-                // Set frog's toward target center point to the touched point
-                //frog.setTowardTargetCenterPoint(new Vector2(screenX, Gdx.graphics.getHeight() - screenY));
-
                 // Check if the pauseButton is down based on the touched point's coordinate
                 pauseButton.update(true, screenX, screenY);
-
                 break;
 
             case FAIL:
@@ -498,7 +462,6 @@ class GameScreen implements Screen, InputProcessor {
                 backToMenuButton.update(true, screenX, screenY);
                 break;
         }
-
         return true;
     }
 
