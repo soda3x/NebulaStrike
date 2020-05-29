@@ -20,7 +20,7 @@ public class Constants {
     public static final String SCOREBOARD_MUSIC_FILENAME = "music/scores.mp3";
     public static final String GAMESCREEN_INITIAL_MUSIC = "music/start.mp3";
     public static final String GAMESCREEN_MUSIC_LOOP = "music/level.mp3";
-    public static final float MUSIC_VOLUME = 100.0f;
+    public static final float MUSIC_VOLUME = 0;
 
     // The constants for font
     public static final String FONT_FONT_FILENAME = "good_neighbors.fnt";
@@ -36,16 +36,23 @@ public class Constants {
     public static final float PLAYER_SPEED = 300.0f;
     public static final float PLAYER_ACCEL = 100.0f;
     public static final float PLAYER_TRACTION = 500.0f;
+    public static final int PLAYER_INIT_LIVES = 3;
+    public static final int PLAYER_MAX_LIVES = 5;
 
-
-    // The constants for enemy
-    public static final String ENEMY_SPRITESHEET = "sprites/Enemy.png";
-    public static final String ENEMY_SPRITESHEET_ALT = "sprites/Enemy_shooting.png";
+    public static final String ENEMY_NORMAL_SPRITESHEET = "sprites/Enemy.png";
+    public static final String ENEMY_NORMAL_SPRITESHEET_ALT = "sprites/Enemy_shooting.png";
+    public static final String ENEMY_BOSS_SPRITESHEET = "sprites/Boss.png";
+    public static final String ENEMY_BOSS_SPRITESHEET_ALT = "sprites/Boss_shooting.png";
+    public static final String ENEMY_BOUNTY_SPRITESHEET = "sprites/Bounty.png";
+    public static final String ENEMY_BOUNTY_SPRITESHEET_ALT = "sprites/Bounty_shooting.png";
     public static final String ENEMY_BULLET = "sprites/Bullet_enemy.png";
 
     public static final float ENEMY_SPEED = 60.0f;
     public static final float ENEMY_ACCEL = 20.0f;
     public static final float ENEMY_TRACTION = 100.0f;
+
+    public static final int SPAWN_RATE_BOSS = 15;
+    public static final int SPAWN_RATE_BOUNTY = 33;
 
 
     // In game hints

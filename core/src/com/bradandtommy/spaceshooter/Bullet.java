@@ -26,7 +26,6 @@ public class Bullet {
         sprite = new Sprite(texture);
     }
 
-    // MODIFY BY TOMMY
     public void update(float deltaTime) {
         if (this.owner == BulletOwner.PLAYER) {
             this.y += SPEED * deltaTime;
@@ -61,5 +60,7 @@ public class Bullet {
     public Rectangle getBoundingRectangle() {
         return new Rectangle(this.getX() + 15, this.getY() + 20, sprite.getWidth() - 30f, sprite.getHeight() - 50);
     }
+
+
 
 }

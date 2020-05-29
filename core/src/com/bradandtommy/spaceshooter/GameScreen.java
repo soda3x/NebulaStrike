@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 class GameScreen implements Screen, InputProcessor {
 
-    // ADDED BY TOMMY
     // The enum for states of the game
     public enum GameState { PLAYING, FAIL, PAUSE };
 
@@ -41,8 +40,6 @@ class GameScreen implements Screen, InputProcessor {
     private long levelCounter;
     private int lives;
     private long timeElapsed;
-
-    // ADDED BY TOMMY
 
     //Buttons
     private Button backToMenuButton;
@@ -61,7 +58,9 @@ class GameScreen implements Screen, InputProcessor {
 
     private void create() {
         gameState = GameState.PLAYING;
-        lives = 3;
+        lives = Constants.PLAYER_INIT_LIVES;
+        scoreCounter = 0;
+        levelCounter = 1;
         input = new InputPoller();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -135,7 +134,7 @@ class GameScreen implements Screen, InputProcessor {
 
         this.updatePause();
         if (gameState == GameState.PAUSE) {
-            // Pause background music and present the PAUSED
+            // Pause background music and present the Pause screen
             initial.setVolume(0.0f);
             bgm.setVolume(0.0f);
             this.drawPaused();
@@ -152,7 +151,7 @@ class GameScreen implements Screen, InputProcessor {
         Background.getBackgroundInstance().update(batch);
 
         if (!enemies.isEmpty()) {
-            for (int i = 0; i < enemies.size(); ++i) {
+            for (int i = 0; i < enemies.size(); i++) {
                 enemies.get(i).draw(batch);
             }
         }
@@ -196,8 +195,6 @@ class GameScreen implements Screen, InputProcessor {
                 (camera.position.x / 2) - 100f, (camera.position.y / 2) - 125f, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
                 Label.Alignment.LEFT, Label.Alignment.CENTER);
 
-        //pauseButton.draw(uiBatch);
-
         batch.begin();
         runningScore.draw(batch);
         runningLevel.draw(batch);
@@ -215,7 +212,7 @@ class GameScreen implements Screen, InputProcessor {
             // Get players hitbox
             sr.rect(this.player.getBoundingRectangle().getX(), this.player.getBoundingRectangle().getY(), this.player.getBoundingRectangle().getWidth(), this.player.getBoundingRectangle().getHeight());
             // Get spawned player bullets hitboxes
-            for (int i = 0; i < player.getSpawnedBullets().size(); ++i) {
+            for (int i = 0; i < player.getSpawnedBullets().size(); i++) {
                 sr.rect(this.player.getSpawnedBullets().get(i).getBoundingRectangle().getX(),
                         this.player.getSpawnedBullets().get(i).getBoundingRectangle().getY(),
                         this.player.getSpawnedBullets().get(i).getBoundingRectangle().getWidth(),
@@ -238,12 +235,10 @@ class GameScreen implements Screen, InputProcessor {
         } else if (backToMenuActive) {
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getMenuScreen());
         } else if (resumeActive) {
-            //isBackKeyPressed = false;
             resumeActive = false;
             backToMenuActive = false;
             initial.setVolume(Constants.MUSIC_VOLUME);
             bgm.setVolume(Constants.MUSIC_VOLUME);
-            //backgroundMusic.play();
             gameState = GameState.PLAYING;
         }
     }
@@ -255,7 +250,6 @@ class GameScreen implements Screen, InputProcessor {
     private void update(float deltaTime) {
 
         if (gameIsPaused()) gameState = GameState.PAUSE;
-
         // Get amount of time game has been on GameScreen so we can calculate things such as when to fire next bullet
         this.timeElapsed = System.currentTimeMillis();
 
@@ -263,20 +257,17 @@ class GameScreen implements Screen, InputProcessor {
 
         camera.update();
 
-        // ADDED BY TOMMY
         for(int i = enemies.size() - 1; i >= 0; i--){
             Enemy enemy = enemies.get(i);
             if (enemy.getY() <= 0) {
                 enemy.dead = true;
             } else {
-                //enemy.move(Gdx.graphics.getDeltaTime());
-                //enemy.update(timeElapsed);
                 enemy.move(deltaTime);
                 enemy.update(deltaTime);
 
                 // Check if enemy's bullets hit player
-                for (Bullet enBullet : enemy.bullets) {
-                    if (enBullet.getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
+                for (int j = 0; j < enemy.bullets.size(); j++) {
+                    if (enemy.bullets.get(j).getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
                         lives -= 1;
                         if (lives <= 0) {
                             lives = 0;
@@ -285,10 +276,28 @@ class GameScreen implements Screen, InputProcessor {
                 }
 
                 // Check if player's bullets hit enemy
-                for (Bullet pyBullet : player.bullets) {
-                    if (pyBullet.getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
+                for (int k = 0; k < player.bullets.size(); k++) {
+                    if (player.bullets.get(k).getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
                         enemy.dead = true;
-                        scoreCounter += 50;
+
+                        // Calculate score and life
+                        switch (enemy.enemykind) {
+                            case NORMAL:
+                                scoreCounter += 50;
+                                break;
+                            case BOSS:
+                                scoreCounter += 200;
+                                break;
+                            case BOUNTY:
+                                scoreCounter += 100;
+                                if (lives == Constants.PLAYER_MAX_LIVES) {
+                                    scoreCounter += 500;
+                                } else {
+                                    lives += 1;
+                                }
+                                break;
+                        }
+
                     }
                 }
             }
@@ -304,11 +313,20 @@ class GameScreen implements Screen, InputProcessor {
         if (enemies.size() < 10) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
-                Enemy enemy = new Enemy();
-                float enemyStartX = MathUtils.random(camera.position.x - enemy.getWidth() / 2, camera.position.x - camera.viewportWidth + enemy.getWidth());
+                Enemy newEnemy;
+                rnd = MathUtils.random(1, 100);
+                if (rnd <= Constants.SPAWN_RATE_BOSS) {
+                    newEnemy = new Enemy(Enemy.EnemyKind.BOSS);
+                } else if (rnd < Constants.SPAWN_RATE_BOUNTY) {
+                    newEnemy = new Enemy(Enemy.EnemyKind.BOUNTY);
+                } else {
+                    newEnemy = new Enemy(Enemy.EnemyKind.NORMAL);
+                }
+
+                float enemyStartX = MathUtils.random(camera.position.x - newEnemy.getWidth() / 2, camera.position.x - camera.viewportWidth + newEnemy.getWidth());
                 float enemyStartY = camera.position.y - camera.viewportHeight;
-                enemy.setPos(camera, enemyStartX, enemyStartY);
-                enemies.add(enemy);
+                newEnemy.setPos(camera, enemyStartX, enemyStartY);
+                enemies.add(newEnemy);
             }
         }
 
@@ -365,12 +383,17 @@ class GameScreen implements Screen, InputProcessor {
         batch.end();
     }
 
-    private void drawScrollingBg() {
-        // Scrolling Background
-    }
-
     @Override
     public void dispose() {
+        batch.dispose();
+        initial.dispose();
+        bgm.dispose();
+        backToMenuButton.dispose();
+        resumeButton.dispose();
+        pauseButton.dispose();
+        for (int i = enemies.size() - 1; i >= 0; i--) {
+            Enemy enemy = enemies.remove(i);
+        }
     }
 
     @Override
@@ -420,12 +443,8 @@ class GameScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         switch (gameState) {
             case PLAYING:
-                // Set frog's toward target center point to the touched point
-                //frog.setTowardTargetCenterPoint(new Vector2(screenX, Gdx.graphics.getHeight() - screenY));
-
                 // Check if the pauseButton is down based on the touched point's coordinate
                 pauseButton.update(true, screenX, screenY);
-
                 break;
 
             case FAIL:
@@ -443,7 +462,6 @@ class GameScreen implements Screen, InputProcessor {
                 backToMenuButton.update(true, screenX, screenY);
                 break;
         }
-
         return true;
     }
 
