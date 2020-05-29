@@ -24,8 +24,9 @@ import java.util.ArrayList;
 
 class GameScreen implements Screen, InputProcessor {
 
+    // ADDING GAMEOVER STATE
     // The enum for states of the game
-    public enum GameState { PLAYING, FAIL, PAUSE };
+    public enum GameState { PLAYING, FAIL, PAUSE, GAMEOVER };
 
     private SpriteBatch batch;
     private Skin skin;
@@ -55,6 +56,9 @@ class GameScreen implements Screen, InputProcessor {
     public GameState gameState;
 
     private ArrayList<Enemy> enemies;
+
+    // ADDED BY TOMMY
+    private String playerName = "";
 
     private void create() {
         gameState = GameState.PLAYING;
@@ -131,6 +135,12 @@ class GameScreen implements Screen, InputProcessor {
     }
 
     public void render(float deltaTime) {
+
+        // ADDED BY TOMMY
+        if (gameState ==  GameState.GAMEOVER) {
+            this.processGameOver();
+            return;
+        }
 
         this.updatePause();
         if (gameState == GameState.PAUSE) {
@@ -220,6 +230,44 @@ class GameScreen implements Screen, InputProcessor {
             }
             sr.end();
         }
+
+        // ADDDED BY TOMMY
+        if (gameState == GameState.FAIL) {
+
+            // Pause background music and present the GAME OVER
+            initial.setVolume(0.0f);
+            bgm.setVolume(0.0f);
+            this.drawGameOver();
+
+            gameState = GameState.GAMEOVER;
+            return;
+        }
+    }
+
+    // ADDDED BY TOMMY
+    private void processGameOver() {
+        if (gameState ==  GameState.GAMEOVER) {
+            if (!playerName.isEmpty()) {
+                if (!playerName.equals("\t")) {
+                    Score finalScore = new Score(playerName, levelCounter, scoreCounter);
+                    ScoreIO scoreIO = SpaceShooter.getSpaceShooterInstance().getScoreScreen().getScores();
+                    if (scoreIO == null || scoreIO.getScores() == null) {
+                        SpaceShooter.getSpaceShooterInstance().getScoreScreen().create();
+                        scoreIO = SpaceShooter.getSpaceShooterInstance().getScoreScreen().getScores();
+                    }
+                    scoreIO.getScores().add(finalScore);
+                    scoreIO.writeToScoresFile(finalScore);
+
+                    BitmapFont scoreFont = new BitmapFont(
+                            Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                            Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                            false);
+                    SpaceShooter.getSpaceShooterInstance().getScoreScreen().initScoreLabels(scoreFont);
+                }
+                SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getScoreScreen());
+            }
+        }
+        return;
     }
 
     private void updatePause() {
@@ -259,6 +307,7 @@ class GameScreen implements Screen, InputProcessor {
 
         for(int i = enemies.size() - 1; i >= 0; i--){
             Enemy enemy = enemies.get(i);
+
             if (enemy.getY() <= 0) {
                 enemy.dead = true;
             } else {
@@ -271,6 +320,8 @@ class GameScreen implements Screen, InputProcessor {
                         lives -= 1;
                         if (lives <= 0) {
                             lives = 0;
+                            // ADDDED BY TOMMY
+                            gameState = GameState.FAIL;
                         }
                     }
                 }
@@ -381,6 +432,47 @@ class GameScreen implements Screen, InputProcessor {
         backToMenuButton.setText(buttonFont, "Back To Menu", Label.Alignment.CENTER, Label.Alignment.CENTER);
         backToMenuButton.draw(batch);
         batch.end();
+    }
+
+    // ADDED BY TOMMY
+    public void drawGameOver() {
+        //Background.getBackgroundInstance().update(batch);
+
+        batch.begin();
+
+        // Font
+        // Create font for buttons' labels
+        BitmapFont buttonFont = new BitmapFont(
+                Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                false);
+        // Scale up the font slightly to make it more legible on larger screens for DEFAULT
+        buttonFont.getData().setScale(2, 2);
+
+        // Determine position to draw
+        float x = (camera.viewportWidth - Constants.BUTTON_WIDTH) / 2;
+        float y = camera.viewportHeight - 3 * Constants.BUTTON_HEIGHT / 2;
+
+        // Draw game over message
+        Label gameOverLabel = new Label(buttonFont, "GAME OVER",
+                0, y, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                Label.Alignment.CENTER, Label.Alignment.CENTER
+        );
+        gameOverLabel.draw(batch);
+
+        batch.end();
+
+        Gdx.input.getTextInput(new Input.TextInputListener() {
+            @Override
+            public void input(String text){
+                playerName = text;
+            }
+
+            @Override
+            public void canceled(){
+                playerName = "\t";
+            }
+        }, "Enter your name", "", "Your name");
     }
 
     @Override

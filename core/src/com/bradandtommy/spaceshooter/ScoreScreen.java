@@ -34,7 +34,8 @@ class ScoreScreen implements Screen, InputProcessor {
     // Scores
     private ScoreIO scores;
 
-    private void create() {
+    // CHANGED BY TOMMY - Create needs to be public
+    public void create() {
         Background.getBackgroundInstance().create();
         // Font for name label and button
         BitmapFont labelFont = new BitmapFont(
@@ -117,7 +118,8 @@ class ScoreScreen implements Screen, InputProcessor {
         }
     }
 
-    private void initScoreLabels(BitmapFont font) {
+    // CHANGED BY TOMMY
+    public void initScoreLabels(BitmapFont font) {
         // Prepare Labels for top 5 scores
         for (int i = 0; i < 5; ++i) {
             Score score = scores.getScores().poll();
@@ -281,5 +283,10 @@ class ScoreScreen implements Screen, InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    // ADDED BY TOMMY
+    public ScoreIO getScores() {
+        return this.scores;
     }
 }
