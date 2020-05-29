@@ -136,9 +136,6 @@ public class Player {
         }
         y = (y < 0) ? y = 0 : y;
 
-        this.setX(x);
-        this.setY(y);
-
         // Friction
         if (Math.abs(velocity.len2()) < 0.01f) {
             /* Floating-point numbers are very inaccurate and will rarely hit absolute

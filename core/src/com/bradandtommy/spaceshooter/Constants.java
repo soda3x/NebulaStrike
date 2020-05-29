@@ -36,21 +36,11 @@ public class Constants {
     public static final float PLAYER_SPEED = 300.0f;
     public static final float PLAYER_ACCEL = 100.0f;
     public static final float PLAYER_TRACTION = 500.0f;
-    public static final int PLAYER_INIT_LIVES = 3;
-    public static final int PLAYER_MAX_LIVES = 5;
+
 
     // The constants for enemy
-    /*public static final String ENEMY_SPRITESHEET = "sprites/Enemy.png";
+    public static final String ENEMY_SPRITESHEET = "sprites/Enemy.png";
     public static final String ENEMY_SPRITESHEET_ALT = "sprites/Enemy_shooting.png";
-    public static final String ENEMY_BULLET = "sprites/Bullet_enemy.png";*/
-
-    // REPLACE BY TOMMY - replace the above with the code below
-    public static final String ENEMY_NORMAL_SPRITESHEET = "sprites/Enemy.png";
-    public static final String ENEMY_NORMAL_SPRITESHEET_ALT = "sprites/Enemy_shooting.png";
-    public static final String ENEMY_BOSS_SPRITESHEET = "sprites/Boss.png";
-    public static final String ENEMY_BOSS_SPRITESHEET_ALT = "sprites/Boss_shooting.png";
-    public static final String ENEMY_BOUNTY_SPRITESHEET = "sprites/Bounty.png";
-    public static final String ENEMY_BOUNTY_SPRITESHEET_ALT = "sprites/Bounty_shooting.png";
     public static final String ENEMY_BULLET = "sprites/Bullet_enemy.png";
 
     public static final float ENEMY_SPEED = 60.0f;

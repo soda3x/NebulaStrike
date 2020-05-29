@@ -47,6 +47,4 @@ public class Background {
         batch.draw(bg2, 0, yCoordBg2);
         batch.end();
     }
-
-
 }
