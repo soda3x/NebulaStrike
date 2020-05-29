@@ -109,7 +109,7 @@ class GameScreen implements Screen, InputProcessor {
 
         // quitButton.setSound(ALERT_SOUND_FILENAME);
         // Button to pause
-        pauseButton = new Button(Gdx.graphics.getWidth() - 50, 10, 32, 32, new Texture("pause.png"), new Texture("pause_pressed.png"));
+        pauseButton = new Button(Gdx.graphics.getWidth() - 50, 10, 32, 32, new Texture(Constants.BUTTON_PAUSE), new Texture(Constants.BUTTON_PAUSE_DOWN));
 
         //------------------------------------
 
@@ -394,6 +394,10 @@ class GameScreen implements Screen, InputProcessor {
         for (int i = enemies.size() - 1; i >= 0; i--) {
             Enemy enemy = enemies.remove(i);
         }
+    }
+
+    public Player getPlayer() {
+        return this.player;
     }
 
     @Override
