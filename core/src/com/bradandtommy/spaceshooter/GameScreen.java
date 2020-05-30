@@ -56,11 +56,18 @@ class GameScreen implements Screen, InputProcessor {
 
     private ArrayList<Enemy> enemies;
 
+    // ADDED BY TOMMY
+    private int enemiesMax;
+
     private void create() {
         gameState = GameState.PLAYING;
         lives = Constants.PLAYER_INIT_LIVES;
         scoreCounter = 0;
         levelCounter = 1;
+
+        // ADDED BY TOMMY
+        enemiesMax = MathUtils.round(levelCounter * Constants.ENEMY_NUMBER_BASE / 2);
+
         input = new InputPoller();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -152,7 +159,11 @@ class GameScreen implements Screen, InputProcessor {
 
         if (!enemies.isEmpty()) {
             for (int i = 0; i < enemies.size(); i++) {
-                enemies.get(i).draw(batch);
+
+                // ADDED BY TOMMY
+                if (!enemies.get(i).isDead()) {
+                    enemies.get(i).draw(batch);
+                }
             }
         }
 
@@ -257,10 +268,19 @@ class GameScreen implements Screen, InputProcessor {
 
         camera.update();
 
-        for(int i = enemies.size() - 1; i >= 0; i--){
+        // ADDED BY TOMMY & for loop MODIFIED
+        int aliveEnemies = 0;
+        for (int i = 0; i < enemies.size(); i++) {
+
+            if (enemies.get(i).isDead()) {
+                continue;
+            }
+
             Enemy enemy = enemies.get(i);
             if (enemy.getY() <= 0) {
-                enemy.dead = true;
+
+                // ADDED BY TOMMY
+                enemy.setPos(camera, enemy.getX(), -Gdx.graphics.getHeight() / 2 + enemy.getHeight() / 2);
             } else {
                 enemy.move(deltaTime);
                 enemy.update(deltaTime);
@@ -301,16 +321,27 @@ class GameScreen implements Screen, InputProcessor {
                     }
                 }
             }
-            if (enemy.isDead()) {
-                enemies.remove(i);
+
+            // MODIFIED BY TOMMY
+            if (!enemy.isDead()) {
+                aliveEnemies += 1;
             }
+
+        }
+
+        // ADDED BY TOMMY
+        if (player.hasFired() && aliveEnemies == 0 && enemies.size() == enemiesMax) {
+            enemies.clear();
+            levelCounter += 1;
+            enemiesMax = MathUtils.round(levelCounter * Constants.ENEMY_NUMBER_BASE / 2);
         }
 
         player.move(deltaTime);
         player.update(timeElapsed);
 
         // Spawn enemy
-        if (enemies.size() < 10) {
+        // MODIFIED BY TOMMY - if condition
+        if (enemies.size() < enemiesMax) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
                 Enemy newEnemy;
@@ -323,8 +354,13 @@ class GameScreen implements Screen, InputProcessor {
                     newEnemy = new Enemy(Enemy.EnemyKind.NORMAL);
                 }
 
-                float enemyStartX = MathUtils.random(camera.position.x - newEnemy.getWidth() / 2, camera.position.x - camera.viewportWidth + newEnemy.getWidth());
-                float enemyStartY = camera.position.y - camera.viewportHeight;
+                //float enemyStartX = MathUtils.random(camera.position.x - newEnemy.getWidth() / 2, camera.position.x - camera.viewportWidth + newEnemy.getWidth());
+                //float enemyStartY = camera.position.y - camera.viewportHeight;
+
+                // MODIFIED THE ENEMY COORDINATE
+                float enemyStartX =  MathUtils.random(Gdx.graphics.getWidth() / 2 + newEnemy.getWidth() / 2, -Gdx.graphics.getWidth() / 2 + newEnemy.getWidth() / 2);
+                float enemyStartY = -Gdx.graphics.getHeight() / 2 + newEnemy.getHeight() / 2;
+
                 newEnemy.setPos(camera, enemyStartX, enemyStartY);
                 enemies.add(newEnemy);
             }

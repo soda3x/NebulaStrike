@@ -49,13 +49,15 @@ public class Constants {
     public static final String ENEMY_BOUNTY_SPRITESHEET_ALT = "sprites/Bounty_shooting.png";
     public static final String ENEMY_BULLET = "sprites/Bullet_enemy.png";
 
+    // ADDED BY TOMMY
+    public static final float ENEMY_NUMBER_BASE = 10;
+
     public static final float ENEMY_SPEED = 60.0f;
     public static final float ENEMY_ACCEL = 20.0f;
     public static final float ENEMY_TRACTION = 100.0f;
 
     public static final int SPAWN_RATE_BOSS = 15;
     public static final int SPAWN_RATE_BOUNTY = 33;
-
 
     // In game hints
     public static final String HINT_1 = "Use W, A, S or D to dash in a direction quickly\r\nPress a combination of these keys for more precise movement\r\nShoot to dismiss this message! (Spacebar)";
