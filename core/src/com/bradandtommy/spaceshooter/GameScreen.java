@@ -259,7 +259,8 @@ class GameScreen implements Screen, InputProcessor {
 
         for(int i = enemies.size() - 1; i >= 0; i--){
             Enemy enemy = enemies.get(i);
-            if (enemy.getY() <= 0) {
+            // FIXING ISSUES #5
+            if (enemy.getY() + enemy.getHeight() <= 0) {
                 enemy.dead = true;
             } else {
                 enemy.move(deltaTime);
@@ -309,8 +310,9 @@ class GameScreen implements Screen, InputProcessor {
         player.move(deltaTime);
         player.update(timeElapsed);
 
+        // FIXING ISSUES #6
         // Spawn enemy
-        if (enemies.size() < 10) {
+        if (player.hasFired() && enemies.size() < 10) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
                 Enemy newEnemy;
