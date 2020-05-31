@@ -268,16 +268,31 @@ class GameScreen implements Screen, InputProcessor {
 
                 // Check if enemy's bullets hit player
                 for (int j = 0; j < enemy.bullets.size(); j++) {
+                    if (enemy.bullets.get(j).hasExpired()) {
+                        Bullet bullet = enemy.bullets.remove(j);
+                        continue;
+                    }
+
                     if (enemy.bullets.get(j).getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
                         lives -= 1;
                         if (lives <= 0) {
                             lives = 0;
                         }
+
+                        // Remove bullet on player hit
+                        enemy.bullets.get(j).setExpired(true);
                     }
                 }
 
                 // Check if player's bullets hit enemy
                 for (int k = 0; k < player.bullets.size(); k++) {
+
+                    // Remove bullet on first enemy hit
+                    if (player.bullets.get(k).hasExpired()) {
+                        Bullet bullet = player.bullets.remove(k);
+                        continue;
+                    }
+
                     if (player.bullets.get(k).getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
                         enemy.dead = true;
 
@@ -298,7 +313,7 @@ class GameScreen implements Screen, InputProcessor {
                                 }
                                 break;
                         }
-
+                        player.bullets.get(k).setExpired(true);
                     }
                 }
             }
