@@ -61,6 +61,7 @@ public class Bullet {
         return new Rectangle(this.getX() + 15, this.getY() + 20, sprite.getWidth() - 30f, sprite.getHeight() - 50);
     }
 
-
-
+    public void setExpired(boolean expired){
+        this.expired = expired;
+    }
 }

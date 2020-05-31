@@ -274,24 +274,45 @@ class GameScreen implements Screen, InputProcessor {
             }
 
             Enemy enemy = enemies.get(i);
+          
             if (enemy.getY() <= 0) {
                 enemy.setPos(camera, enemy.getX(), - Gdx.graphics.getHeight() / 2f + enemy.getHeight() / 2);
+            }
+          
+            // Despawn enemies when they leave bottom of screen
+            if (enemy.getY() + enemy.getHeight() <= 0) {
+                enemy.dead = true;
             } else {
                 enemy.move(deltaTime);
                 enemy.update(deltaTime);
 
                 // Check if enemy's bullets hit player
                 for (int j = 0; j < enemy.bullets.size(); j++) {
+                    if (enemy.bullets.get(j).hasExpired()) {
+                        Bullet bullet = enemy.bullets.remove(j);
+                        continue;
+                    }
+
                     if (enemy.bullets.get(j).getBoundingRectangle().overlaps(player.getBoundingRectangle())) {
                         lives -= 1;
                         if (lives <= 0) {
                             lives = 0;
                         }
+
+                        // Remove bullet on player hit
+                        enemy.bullets.get(j).setExpired(true);
                     }
                 }
 
                 // Check if player's bullets hit enemy
                 for (int k = 0; k < player.bullets.size(); k++) {
+
+                    // Remove bullet on first enemy hit
+                    if (player.bullets.get(k).hasExpired()) {
+                        Bullet bullet = player.bullets.remove(k);
+                        continue;
+                    }
+
                     if (player.bullets.get(k).getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
                         enemy.dead = true;
 
@@ -312,7 +333,7 @@ class GameScreen implements Screen, InputProcessor {
                                 }
                                 break;
                         }
-
+                        player.bullets.get(k).setExpired(true);
                     }
                 }
             }
@@ -330,9 +351,8 @@ class GameScreen implements Screen, InputProcessor {
 
         player.move(deltaTime);
         player.update(timeElapsed);
-
-        // Spawn enemy
-        if (enemies.size() < enemiesMax) {
+        // Spawn enemy once start hint has been dismissed
+        if (player.hasFired() && enemies.size() < enemiesMax) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
                 Enemy newEnemy;
