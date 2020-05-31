@@ -267,8 +267,6 @@ class GameScreen implements Screen, InputProcessor {
 
                 // Check if enemy's bullets hit player
                 for (int j = 0; j < enemy.bullets.size(); j++) {
-
-                    // ADDED BY TOMMY
                     if (enemy.bullets.get(j).hasExpired()) {
                         Bullet bullet = enemy.bullets.remove(j);
                         continue;
@@ -280,7 +278,7 @@ class GameScreen implements Screen, InputProcessor {
                             lives = 0;
                         }
 
-                        // ADDED BY TOMMY
+                        // Remove bullet on player hit
                         enemy.bullets.get(j).setExpired(true);
                     }
                 }
@@ -288,7 +286,7 @@ class GameScreen implements Screen, InputProcessor {
                 // Check if player's bullets hit enemy
                 for (int k = 0; k < player.bullets.size(); k++) {
 
-                    // ADDED BY TOMMY
+                    // Remove bullet on first enemy hit
                     if (player.bullets.get(k).hasExpired()) {
                         Bullet bullet = player.bullets.remove(k);
                         continue;
@@ -314,8 +312,6 @@ class GameScreen implements Screen, InputProcessor {
                                 }
                                 break;
                         }
-
-                        // ADDED BY TOMMY
                         player.bullets.get(k).setExpired(true);
                     }
                 }
