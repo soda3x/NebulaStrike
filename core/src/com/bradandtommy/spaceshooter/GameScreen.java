@@ -65,7 +65,7 @@ class GameScreen implements Screen, InputProcessor {
         scoreCounter = 0;
         levelCounter = 1;
 
-        // ADDED BY TOMMY
+        // Calculate number of enemies to draw on screen per level
         enemiesMax = MathUtils.round(levelCounter * Constants.ENEMY_NUMBER_BASE / 2);
 
         input = new InputPoller();
@@ -159,8 +159,6 @@ class GameScreen implements Screen, InputProcessor {
 
         if (!enemies.isEmpty()) {
             for (int i = 0; i < enemies.size(); i++) {
-
-                // ADDED BY TOMMY
                 if (!enemies.get(i).isDead()) {
                     enemies.get(i).draw(batch);
                 }
@@ -268,7 +266,6 @@ class GameScreen implements Screen, InputProcessor {
 
         camera.update();
 
-        // ADDED BY TOMMY & for loop MODIFIED
         int aliveEnemies = 0;
         for (int i = 0; i < enemies.size(); i++) {
 
@@ -278,9 +275,7 @@ class GameScreen implements Screen, InputProcessor {
 
             Enemy enemy = enemies.get(i);
             if (enemy.getY() <= 0) {
-
-                // ADDED BY TOMMY
-                enemy.setPos(camera, enemy.getX(), -Gdx.graphics.getHeight() / 2 + enemy.getHeight() / 2);
+                enemy.setPos(camera, enemy.getX(), - Gdx.graphics.getHeight() / 2f + enemy.getHeight() / 2);
             } else {
                 enemy.move(deltaTime);
                 enemy.update(deltaTime);
@@ -321,15 +316,12 @@ class GameScreen implements Screen, InputProcessor {
                     }
                 }
             }
-
-            // MODIFIED BY TOMMY
             if (!enemy.isDead()) {
                 aliveEnemies += 1;
             }
-
         }
 
-        // ADDED BY TOMMY
+        // Move to next level if all enemies are dead
         if (player.hasFired() && aliveEnemies == 0 && enemies.size() == enemiesMax) {
             enemies.clear();
             levelCounter += 1;
@@ -340,7 +332,6 @@ class GameScreen implements Screen, InputProcessor {
         player.update(timeElapsed);
 
         // Spawn enemy
-        // MODIFIED BY TOMMY - if condition
         if (enemies.size() < enemiesMax) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
@@ -354,12 +345,8 @@ class GameScreen implements Screen, InputProcessor {
                     newEnemy = new Enemy(Enemy.EnemyKind.NORMAL);
                 }
 
-                //float enemyStartX = MathUtils.random(camera.position.x - newEnemy.getWidth() / 2, camera.position.x - camera.viewportWidth + newEnemy.getWidth());
-                //float enemyStartY = camera.position.y - camera.viewportHeight;
-
-                // MODIFIED THE ENEMY COORDINATE
-                float enemyStartX =  MathUtils.random(Gdx.graphics.getWidth() / 2 + newEnemy.getWidth() / 2, -Gdx.graphics.getWidth() / 2 + newEnemy.getWidth() / 2);
-                float enemyStartY = -Gdx.graphics.getHeight() / 2 + newEnemy.getHeight() / 2;
+                float enemyStartX =  MathUtils.random(Gdx.graphics.getWidth() / 2f + newEnemy.getWidth() / 2, - Gdx.graphics.getWidth() / 2f + newEnemy.getWidth() / 2);
+                float enemyStartY = -Gdx.graphics.getHeight() / 2f + newEnemy.getHeight() / 2;
 
                 newEnemy.setPos(camera, enemyStartX, enemyStartY);
                 enemies.add(newEnemy);
