@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -23,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import java.util.ArrayList;
 
 class GameScreen implements Screen, InputProcessor {
-
     // The enum for states of the game
     public enum GameState { PLAYING, FAIL, PAUSE };
 
@@ -34,6 +34,7 @@ class GameScreen implements Screen, InputProcessor {
     private Player player;
     private Music initial;
     private Music bgm;
+    private Sound tutorialSpeech;
     private boolean showHitboxes = false;
     private InputPoller input;
     private long scoreCounter;
@@ -50,6 +51,9 @@ class GameScreen implements Screen, InputProcessor {
     private boolean backToMenuActive;
     private boolean resumeActive;
     private boolean pauseActive;
+    private boolean musicConfigured;
+
+    private boolean spawnedGameOverScreen;
 
     // The game's current state
     public GameState gameState;
@@ -60,6 +64,8 @@ class GameScreen implements Screen, InputProcessor {
     private int enemiesMax;
 
     private void create() {
+        this.musicConfigured = false;
+        this.spawnedGameOverScreen = false;
         gameState = GameState.PLAYING;
         lives = Constants.PLAYER_INIT_LIVES;
         scoreCounter = 0;
@@ -72,23 +78,8 @@ class GameScreen implements Screen, InputProcessor {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        initial = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_INITIAL_MUSIC));
-        initial.setLooping(false);
-        initial.play();
-        initial.setVolume(Constants.MUSIC_VOLUME);
-
-        if (initial.isPlaying()) {
-            bgm = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_MUSIC_LOOP));
-            bgm.setLooping(true);
-            bgm.setVolume(Constants.MUSIC_VOLUME);
-        }
-
-        initial.setOnCompletionListener(new Music.OnCompletionListener() {
-            @Override
-            public void onCompletion(Music music) {
-                bgm.play();
-            }
-        });
+        tutorialSpeech = Gdx.audio.newSound(Gdx.files.internal(Constants.TUTORIAL_SPEECH));
+        tutorialSpeech.play();
 
         camera = new OrthographicCamera(w, h);
         camera.setToOrtho(false, w, h);
@@ -135,6 +126,27 @@ class GameScreen implements Screen, InputProcessor {
 
         // Enable receiving all touch and key input events
         Gdx.input.setInputProcessor(this);
+    }
+
+    public void configureMusic() {
+        initial = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_INITIAL_MUSIC));
+        initial.setLooping(false);
+        initial.play();
+        initial.setVolume(Constants.MUSIC_VOLUME);
+
+        if (initial.isPlaying()) {
+            bgm = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_MUSIC_LOOP));
+            bgm.setLooping(true);
+            bgm.setVolume(Constants.MUSIC_VOLUME);
+        }
+
+        initial.setOnCompletionListener(new Music.OnCompletionListener() {
+            @Override
+            public void onCompletion(Music music) {
+                bgm.play();
+            }
+        });
+        this.musicConfigured = true;
     }
 
     public void render(float deltaTime) {
@@ -258,6 +270,36 @@ class GameScreen implements Screen, InputProcessor {
 
     private void update(float deltaTime) {
 
+        if (!musicConfigured && player.hasFired()) {
+            this.configureMusic();
+            tutorialSpeech.stop();
+        }
+
+        if (this.lives == 0) {
+            this.gameState = GameState.FAIL;
+        }
+
+        if (gameState == GameState.FAIL) {
+
+            ScoreIO scoreIO = new ScoreIO();
+            for (Score score : scoreIO.getScores()) {
+                if (new Score("newScore", levelCounter - 1, scoreCounter).higherScoreThan(score)) {
+                    // Pass in score to get new high score screen
+                    this.spawnedGameOverScreen = true;
+                    SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score));
+                    break;
+                } else {
+                    continue;
+                }
+            }
+            // Pass in null to get generic game over screen
+            if (!spawnedGameOverScreen) {
+                SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(null));
+            }
+
+            this.dispose();
+        }
+
         if (gameIsPaused()) gameState = GameState.PAUSE;
         // Get amount of time game has been on GameScreen so we can calculate things such as when to fire next bullet
         this.timeElapsed = System.currentTimeMillis();
@@ -279,9 +321,10 @@ class GameScreen implements Screen, InputProcessor {
                 enemy.setPos(camera, enemy.getX(), - Gdx.graphics.getHeight() / 2f + enemy.getHeight() / 2);
             }
           
-            // Despawn enemies when they leave bottom of screen
+            // De-spawn enemies when they leave bottom of screen
             if (enemy.getY() + enemy.getHeight() <= 0) {
                 enemy.dead = true;
+
             } else {
                 enemy.move(deltaTime);
                 enemy.update(deltaTime);
@@ -314,6 +357,8 @@ class GameScreen implements Screen, InputProcessor {
                     }
 
                     if (player.bullets.get(k).getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
+                        Sound enemyHitSound = Gdx.audio.newSound(Gdx.files.internal(Constants.HIT_SND));
+                        enemyHitSound.play();
                         enemy.dead = true;
 
                         // Calculate score and life
@@ -341,7 +386,6 @@ class GameScreen implements Screen, InputProcessor {
                 aliveEnemies += 1;
             }
         }
-
         // Move to next level if all enemies are dead
         if (player.hasFired() && aliveEnemies == 0 && enemies.size() == enemiesMax) {
             enemies.clear();

@@ -17,6 +17,11 @@ public class Score {
     public String getName() {
         return this.name;
     }
+
+    public boolean higherScoreThan(Score other) {
+        return this.getScore() > other.getScore();
+    }
+
     public void setName(String name) {
         this.name = name;
     }

@@ -145,7 +145,7 @@ public class MenuScreen implements Screen, InputProcessor {
             quitActive = true;
 
         } else if (startActive) {
-            SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameScreen());
+            SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(null));
         } else if (creditActive) {
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getCreditsScreen());
         } else if (scoreboardActive) {

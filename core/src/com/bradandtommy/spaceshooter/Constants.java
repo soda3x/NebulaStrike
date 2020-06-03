@@ -16,13 +16,18 @@ public class Constants {
     // The constants for button sounds
     public static final String BUTTON_SND_1 = "sound/button1.mp3";
     public static final String BUTTON_SND_2 = "sound/button2.wav";
+    public static final String PLAYER_SHOOT_SND = "sound/player_shoot.mp3";
+    public static final String HIT_SND = "sound/enemy_hit.mp3";
+    public static final String TUTORIAL_SPEECH = "sound/tutorial_speech.mp3";
 
     // The constants for music
     public static final String MENU_MUSIC_FILENAME = "music/menu.mp3";
     public static final String SCOREBOARD_MUSIC_FILENAME = "music/scores.mp3";
     public static final String GAMESCREEN_INITIAL_MUSIC = "music/start.mp3";
     public static final String GAMESCREEN_MUSIC_LOOP = "music/level.mp3";
-    public static final float MUSIC_VOLUME = 0;
+    public static final String GAMEOVER_FAIL_MUSIC = "music/gameover.mp3";
+    public static final String GAMEOVER_WIN_MUSIC = "music/gameover_newscore.mp3";
+    public static final float MUSIC_VOLUME = 1.0f;
 
     // The constants for font
     public static final String FONT_FONT_FILENAME = "good_neighbors.fnt";

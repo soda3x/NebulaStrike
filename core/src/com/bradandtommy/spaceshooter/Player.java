@@ -1,5 +1,6 @@
 package com.bradandtommy.spaceshooter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -158,6 +159,8 @@ public class Player {
             if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= shootCooldownMillis) {
                 timeElapsedSinceLastCalled = timeElapsedWhenCalled;
                 initSprite(Constants.PLAYER_SPRITESHEET_ALT);
+                Sound shoot = Gdx.audio.newSound(Gdx.files.internal(Constants.PLAYER_SHOOT_SND));
+                shoot.play();
                 // ADDED parameter
                 bullets.add(new Bullet(Bullet.BulletOwner.PLAYER, this.getX(), this.getY(), Constants.PLAYER_BULLET));
             }

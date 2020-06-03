@@ -63,6 +63,13 @@ public class SpaceShooter extends Game implements ApplicationListener {
 	}
 	CreditsScreen getCreditsScreen() { return creditsScreen; }
 	ScoreScreen getScoreScreen() { return scoreScreen; }
+	GameOverScreen getGameOverScreen(Score score) {
+	 	if (score != null) {
+	 		return new GameOverScreen(score);
+		} else {
+	 		return new GameOverScreen();
+		}
+	 }
 
 
 	/**
