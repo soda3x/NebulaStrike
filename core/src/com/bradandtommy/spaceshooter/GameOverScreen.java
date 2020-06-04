@@ -16,31 +16,43 @@ public class GameOverScreen implements Screen, InputProcessor {
 
     // Labels
     private Label menuLabel;
+    private Label scoreLabel;
     private Label newScoreLabel;
     private Label tryAgainPromptLabel;
 
+    // Container for name input
+    private String[] name;
+    private String hint;
+
     // Buttons
     private Button backToMenuButton;
+    private Button playAgainButton;
 
     // Music
     private Music menuMusic;
 
     // Score
     private Score score;
+    ScoreIO scoreIO;
 
     // Init active flags by false
     private boolean backToMenuActive;
+    private boolean playAgainActive;
 
-    public GameOverScreen() {
-        this.score = null;
-    }
+    private boolean newHighScore;
 
-    // Constructor for if player gets a new high score
-    public GameOverScreen(Score score) {
+    // Keyboard listener
+    private AlphaInputPoller alpha;
+
+    public GameOverScreen(Score score, boolean newHighScore) {
+        this.newHighScore = newHighScore;
         this.score = score;
+        this.scoreIO = new ScoreIO();
     }
 
     private void create() {
+        hint = "Press ENTER to add your score to the high scores table";
+        this.alpha = new AlphaInputPoller();
         Background.getBackgroundInstance().create();
         // Font for name label and button
         BitmapFont labelFont = new BitmapFont(
@@ -76,7 +88,21 @@ public class GameOverScreen implements Screen, InputProcessor {
         tryAgainFont.setColor(1f,0f,0f,1f);
 
         tryAgainPromptLabel = new Label(tryAgainFont, "The aliens are still out there, and they're heading straight for Earth!\r\nGet out there and fight again!",
-                0f, Gdx.graphics.getHeight() - 2 * Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                0f, Gdx.graphics.getHeight() - 3.5f * Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                Label.Alignment.CENTER, Label.Alignment.CENTER
+        );
+
+        BitmapFont scoreFont = new BitmapFont(
+                Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                false);
+
+        // Scale up the font slightly to make it more legible on larger screens for DEFAULT
+        scoreFont.getData().setScale(2, 2);
+        scoreFont.setColor(1f,1f,1f,1f);
+
+        scoreLabel = new Label(scoreFont, Long.toString(score.getScore()) + " points",
+                0f, Gdx.graphics.getHeight() - 2.5f * Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
                 Label.Alignment.CENTER, Label.Alignment.CENTER
         );
 
@@ -88,7 +114,11 @@ public class GameOverScreen implements Screen, InputProcessor {
         float buttonX = (Gdx.graphics.getWidth() - Constants.BUTTON_WIDTH) / 2;
         float buttonY = (Gdx.graphics.getHeight() - 2 * Constants.BUTTON_HEIGHT);
 
-        backToMenuButton = new Button(buttonX, buttonY - 3 * (Constants.BUTTON_HEIGHT + Constants.BUTTON_SPACING), Constants.BUTTON_WIDTH + 20, Constants.BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
+        playAgainButton = new Button(buttonX, buttonY - 3 * (Constants.BUTTON_HEIGHT + Constants.BUTTON_SPACING), Constants.BUTTON_WIDTH + 20, Constants.BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
+        playAgainButton.setText(buttonFont, "Play Again", Label.Alignment.CENTER, Label.Alignment.CENTER);
+        playAgainButton.setSound(Constants.BUTTON_SND_1);
+
+        backToMenuButton = new Button(buttonX, buttonY - 3.5f * (Constants.BUTTON_HEIGHT + Constants.BUTTON_SPACING), Constants.BUTTON_WIDTH + 20, Constants.BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
         backToMenuButton.setText(buttonFont, "Back to Menu", Label.Alignment.CENTER, Label.Alignment.CENTER);
         backToMenuButton.setSound(Constants.BUTTON_SND_1);
 
@@ -106,9 +136,13 @@ public class GameOverScreen implements Screen, InputProcessor {
         Gdx.input.setInputProcessor(this);
 
         backToMenuActive = false;
+        playAgainActive = false;
 
         // Instantiate SpriteBatch
         batch = new SpriteBatch();
+
+        // Limit name to size of 3 for XYZ input style
+        this.name = new String[3];
 
     }
 
@@ -127,19 +161,11 @@ public class GameOverScreen implements Screen, InputProcessor {
                 Label.Alignment.CENTER, Label.Alignment.CENTER
         );
 
-        newScoreLabel = new Label(labelFont, "_ _ _",
-                0f, Gdx.graphics.getHeight() - 2 * Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
-                Label.Alignment.CENTER, Label.Alignment.CENTER
-        );
-    }
-
-    private void assembleKeyboard() {
-
     }
 
     @Override
     public void show() {
-        if (this.score == null) {
+        if (!this.newHighScore) {
             this.create();
         } else {
             this.createWithScore();
@@ -161,17 +187,20 @@ public class GameOverScreen implements Screen, InputProcessor {
 
         //Draw buttons
         backToMenuButton.draw(batch);
+        playAgainButton.draw(batch);
 
         batch.end();
 
         // If score is not null then render new high score elements
-        if (score != null) {
+        if (this.newHighScore) {
             batch.begin();
             newScoreLabel.draw(batch);
+            scoreLabel.draw(batch);
             batch.end();
         } else {
             batch.begin();
             tryAgainPromptLabel.draw(batch);
+            scoreLabel.draw(batch);
             batch.end();
         }
 
@@ -183,6 +212,83 @@ public class GameOverScreen implements Screen, InputProcessor {
         } else if (backToMenuActive) {
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getMenuScreen());
         }
+
+        if (playAgainButton.isDown) {
+            menuMusic.stop();
+            playAgainActive = true;
+        } else if (playAgainActive) {
+            SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameScreen());
+        }
+
+        // Let's get keyboard input if we need to enter a score
+        if (newHighScore) {
+            alpha.poll();
+            pollForInput();
+            BitmapFont scoreEntryFont = new BitmapFont(
+                    Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                    Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                    false);
+            // Scale up the font slightly to make it more legible on larger screens for DEFAULT
+            scoreEntryFont.getData().setScale(2, 2);
+            scoreEntryFont.setColor(1f,1f,1f,1f);
+
+            String x = "_";
+            String y = "_";
+            String z = "_";
+            if (name[0] != null) {
+                x = name[0];
+            }
+            if (name[1] != null) {
+                y = name[1];
+            }
+            if (name[2] != null) {
+                z = name[2];
+            }
+
+            Label enterYourNameLabel =  new Label(scoreEntryFont, "Enter Your Name",
+                    0f, Gdx.graphics.getHeight() / 1.75f - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                    Label.Alignment.CENTER, Label.Alignment.CENTER
+            );
+
+            Label scoreEntryLabel = new Label(scoreEntryFont, x + " " + y + " " + z + " ",
+                    0f, Gdx.graphics.getHeight() / 2f - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                    Label.Alignment.CENTER, Label.Alignment.CENTER
+            );
+
+
+
+            if (name[0] != null && name[1] != null && name[2] != null) {
+                BitmapFont hintFont = new BitmapFont(
+                        Gdx.files.internal(Constants.FONT_FONT_FILENAME),
+                        Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
+                        false);
+                // Scale up the font slightly to make it more legible on larger screens for DEFAULT
+                hintFont.getData().setScale(1, 1);
+                hintFont.setColor(1f,1f,1f,0.5f);
+                Label pressEnterHint =  new Label(hintFont, hint,
+                        0f, Gdx.graphics.getHeight() / 2.5f - Constants.BUTTON_HEIGHT, Gdx.graphics.getWidth(), Constants.BUTTON_HEIGHT,
+                        Label.Alignment.CENTER, Label.Alignment.CENTER
+                );
+                batch.begin();
+                pressEnterHint.draw(batch);
+                batch.end();
+
+                if (alpha.confirm.pressed()) {
+                    if (scoreIO.writeToScoresFile(new Score(name[0]+name[1]+name[2], this.score.getLevel(), this.score.getScore()))) {
+                        hint = "Successfully added score to the high scores table,\nfeel free to play again or return to the main menu";
+                    }
+                }
+
+            }
+            batch.begin();
+            enterYourNameLabel.draw(batch);
+            scoreEntryLabel.draw(batch);
+            batch.end();
+        }
+    }
+
+    private void pollForInput() {
+        this.alpha.stringBuffer(name);
     }
 
     @Override
@@ -228,12 +334,14 @@ public class GameOverScreen implements Screen, InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         backToMenuButton.update(true, screenX, screenY);
+        playAgainButton.update(true, screenX, screenY);
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         backToMenuButton.update(false, screenX, screenY);
+        playAgainButton.update(false, screenX, screenY);
         return true;
     }
 

@@ -220,7 +220,7 @@ class GameScreen implements Screen, InputProcessor {
         runningScore.draw(batch);
         runningLevel.draw(batch);
         runningLife.draw(batch);
-        pauseButton.draw(batch);
+        if(player.hasFired()) pauseButton.draw(batch);
         batch.end();
 
         this.update(deltaTime);
@@ -286,15 +286,16 @@ class GameScreen implements Screen, InputProcessor {
                 if (new Score("newScore", levelCounter - 1, scoreCounter).higherScoreThan(score)) {
                     // Pass in score to get new high score screen
                     this.spawnedGameOverScreen = true;
-                    SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score));
+                    SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, true));
                     break;
                 } else {
                     continue;
                 }
             }
-            // Pass in null to get generic game over screen
+            // Generic game over screen
             if (!spawnedGameOverScreen) {
-                SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(null));
+                Score score = new Score("NONAME", levelCounter - 1, scoreCounter);
+                SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, false));
             }
 
             this.dispose();
