@@ -16,6 +16,10 @@ public class Enemy {
 
     public enum EnemyKind { NORMAL, BOSS, BOUNTY }
 
+    // ADDED BY TOMMY * - Movement pattern
+    public enum MoveDirection { LEFT, RIGHT, NONE }
+    private MoveDirection moveDirection;
+
     private Sprite sprite;
     private Texture enemySheet;
     private Animation enemyAnimation;
@@ -43,6 +47,10 @@ public class Enemy {
     public ArrayList<Bullet> bullets;
 
     public Enemy(EnemyKind enemykind) {
+
+        // ADDED BY TOMMY *
+        moveDirection = MoveDirection.NONE;
+
         this.enemykind = enemykind;
 
         this.movement = new Vector2();
@@ -138,6 +146,14 @@ public class Enemy {
         this.y = newY;
     }
 
+    // ADDED BY TOMMY *
+    public MoveDirection getMoveDirection() {
+        return this.moveDirection;
+    }
+    public void setMoveDirection(MoveDirection value) {
+        this.moveDirection = value;
+    }
+
     public boolean isDead() {
         return this.dead;
     }
@@ -161,13 +177,38 @@ public class Enemy {
         GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
 
         //movement.set(0f, 0f);
-        movement.y -= 1;
+
+        // MODIFIED BY TOMMY * - Temporary
+
+        if ( ! (this.moveDirection == MoveDirection.LEFT && this.y < 300)) {
+            movement.y -= 1;
+        }
+
+        //movement.y -= 1;
 
         // enemies move toward to player
-        if (this.x > g.getPlayer().getX()) {
+        /*if (this.x > g.getPlayer().getX()) {
             movement.x -= 1;
         } else if (this.x < g.getPlayer().getX()) {
             movement.x += 1;
+        }*/
+
+
+        // ADDED BY TOMMY *
+        if (this.moveDirection != MoveDirection.NONE) {
+            if (this.getX() <= 0) {
+                this.moveDirection = MoveDirection.RIGHT;
+            } else if (this.getX() + this.getWidth() >= Gdx.graphics.getWidth()) {
+                this.moveDirection = MoveDirection.LEFT;
+            }
+            switch (this.moveDirection) {
+                case LEFT:
+                    movement.x -= 1;
+                    break;
+                case RIGHT:
+                    movement.x += 1;
+                    break;
+            }
         }
 
         if (movement.len2() > 1.0f) movement.nor();

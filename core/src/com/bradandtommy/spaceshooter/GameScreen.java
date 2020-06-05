@@ -318,7 +318,7 @@ class GameScreen implements Screen, InputProcessor {
 
             Enemy enemy = enemies.get(i);
           
-            if (enemy.getY() <= 0) {
+            if (enemy.getY() + enemy.getHeight() <= 0) {
                 enemy.setPos(camera, enemy.getX(), - Gdx.graphics.getHeight() / 2f + enemy.getHeight() / 2);
             }
           
@@ -410,11 +410,27 @@ class GameScreen implements Screen, InputProcessor {
                     newEnemy = new Enemy(Enemy.EnemyKind.NORMAL);
                 }
 
-                float enemyStartX =  MathUtils.random(Gdx.graphics.getWidth() / 2f + newEnemy.getWidth() / 2, - Gdx.graphics.getWidth() / 2f + newEnemy.getWidth() / 2);
-                float enemyStartY = -Gdx.graphics.getHeight() / 2f + newEnemy.getHeight() / 2;
+                //float enemyStartX =  MathUtils.random(Gdx.graphics.getWidth() / 2f + newEnemy.getWidth() / 2, - Gdx.graphics.getWidth() / 2f + newEnemy.getWidth() / 2);
+                //float enemyStartY = -Gdx.graphics.getHeight() / 2f + newEnemy.getHeight() / 2;
+
+                // MODIFIED THE ENEMY COORDINATE *
+                float enemyStartX = MathUtils.random(camera.position.x, camera.position.x - camera.viewportWidth + newEnemy.getWidth());
+                float enemyStartY = camera.position.y + camera.viewportWidth - newEnemy.getHeight();
+
+                // ADDED BY TOMMY *
+                newEnemy.setMoveDirection(Enemy.MoveDirection.NONE);
+                int rndMove = MathUtils.random(1, 3);
+                if (rndMove == 2 || newEnemy.enemykind == Enemy.EnemyKind.BOSS || newEnemy.enemykind == Enemy.EnemyKind.BOUNTY) {
+                    if (enemyStartX <= camera.position.x) {
+                        newEnemy.setMoveDirection(Enemy.MoveDirection.LEFT);
+                    } else if (enemyStartX > camera.position.x) {
+                        newEnemy.setMoveDirection(Enemy.MoveDirection.RIGHT);
+                    }
+                }
 
                 newEnemy.setPos(camera, enemyStartX, enemyStartY);
                 enemies.add(newEnemy);
+
             }
         }
 
