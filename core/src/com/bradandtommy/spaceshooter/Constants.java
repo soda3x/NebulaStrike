@@ -53,8 +53,9 @@ public class Constants {
     public static final String ENEMY_BOUNTY_SPRITESHEET = "sprites/Bounty.png";
     public static final String ENEMY_BOUNTY_SPRITESHEET_ALT = "sprites/Bounty_shooting.png";
     public static final String ENEMY_BULLET = "sprites/Bullet_enemy.png";
+    public static final String ENEMY_BULLET_BOUNTY = "sprites/Bullet_enemy_bounty.png";
+    public static final String ENEMY_BULLET_BOSS = "sprites/Bullet_boss.png";
 
-    // ADDED BY TOMMY
     public static final float ENEMY_NUMBER_BASE = 10;
 
     public static final float ENEMY_SPEED = 60.0f;

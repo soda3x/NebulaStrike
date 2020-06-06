@@ -1,5 +1,6 @@
 package com.bradandtommy.spaceshooter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -39,6 +40,10 @@ public class Enemy {
     private Vector2 movement;
     private Vector2 velocity;
     private boolean hasFired;
+    private long timeElapsedSinceLastCalled;
+    private final long shootCooldownMillis = 300;
+    private final long bossShootCooldownMillis = 2000;
+    private int health = 1;
 
     public ArrayList<Bullet> bullets;
 
@@ -64,6 +69,7 @@ public class Enemy {
                 break;
             case BOSS:
                 enemySheet = new Texture(Constants.ENEMY_BOSS_SPRITESHEET);
+                this.health = 10;
                 break;
             case BOUNTY:
                 enemySheet = new Texture(Constants.ENEMY_BOUNTY_SPRITESHEET);
@@ -90,7 +96,7 @@ public class Enemy {
                 enemySheet = new Texture(Constants.ENEMY_BOSS_SPRITESHEET_ALT);
                 break;
             case BOUNTY:
-                enemySheet = new Texture(Constants.ENEMY_BOUNTY_SPRITESHEET);
+                enemySheet = new Texture(Constants.ENEMY_BOUNTY_SPRITESHEET_ALT);
                 break;
         }
         temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
@@ -102,8 +108,6 @@ public class Enemy {
             }
         }
         shootingAnimation = new Animation<TextureRegion>(FRAME_DURATION, shootingFrames);
-
-        enemySheet.dispose();
     }
 
     public void switchSprite(Boolean isShooting) {
@@ -161,7 +165,9 @@ public class Enemy {
         GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
 
         //movement.set(0f, 0f);
-        movement.y -= 1;
+        if (enemykind != EnemyKind.BOSS) {
+            movement.y -= 1;
+        }
 
         // enemies move toward to player
         if (this.x > g.getPlayer().getX()) {
@@ -176,6 +182,9 @@ public class Enemy {
         if (movement.len2() > 0.1f) {
             if (movement.len2() > 1.0f) movement.nor();
             float speed = Constants.ENEMY_SPEED;
+            if (enemykind == EnemyKind.BOUNTY) {
+                speed = Constants.ENEMY_SPEED * 3;
+            }
             float max = speed - velocity.len();
             if (max > 0.0f) {
                 float accel = Constants.ENEMY_ACCEL * deltaTime * speed;
@@ -184,8 +193,10 @@ public class Enemy {
             }
         }
 
-        this.setX(velocity.x * deltaTime + getX());
-        this.setY(velocity.y * deltaTime + getY());
+        if (enemykind == EnemyKind.BOSS && firingTimer(System.currentTimeMillis())) {
+            this.setX(velocity.x * deltaTime + getX());
+            this.setY(velocity.y * deltaTime + getY());
+        }
 
         // Friction
         if (Math.abs(velocity.len2()) < 0.01f) {
@@ -204,25 +215,69 @@ public class Enemy {
         }
     }
 
-    public void update(float deltaTime) {
+    private boolean firingTimer(long timeElapsedWhenCalled) {
+        if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= shootCooldownMillis) {
+            timeElapsedSinceLastCalled = timeElapsedWhenCalled;
+            return true;
+        }
+        timeElapsedSinceLastCalled = timeElapsedWhenCalled;
+        return false;
+    }
+
+    public void update(float deltaTime, long timeElapsedWhenCalled) {
         // Move bullets
         for (Bullet bullet : bullets) {
             bullet.update(deltaTime);
         }
         // Enemy is random shooting
         int rnd = MathUtils.random(1,100);
-        if (rnd == 50) {
-            hasFired = true;
-            switchSprite(true);
-            bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET));
+        if (enemykind != EnemyKind.BOSS) {
+            if (rnd == 50) {
+                hasFired = true;
+                switchSprite(true);
+                // Switch bullet type based on enemy type
+                if (this.enemykind == EnemyKind.NORMAL) {
+                    bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET));
+
+                } else if (this.enemykind == EnemyKind.BOUNTY) {
+                    // Mix up attack pattern to make it more challenging
+                    int shootPatternRnd = MathUtils.random(1, 100);
+                    if (shootPatternRnd < 20) {
+                        for (int i = 0; i < 5; ++i) {
+                            bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX() + (i * 15), this.getY() + (i * 15), Constants.ENEMY_BULLET_BOUNTY));
+                            bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX() + (-i * 15), this.getY() + (i * 15), Constants.ENEMY_BULLET_BOUNTY));
+                        }
+                    } else {
+                        bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET_BOUNTY));
+                    }
+                }
+                for (int i = 0; i < bullets.size(); i++) {
+                    if (bullets.get(i).hasExpired()) {
+                        bullets.remove(bullets.get(i));
+                        continue;
+                    }
+                }
+            } else {
+                if (firingTimer(System.currentTimeMillis())) switchSprite(false);
+            }
+            // boss attack logic
+        } else {
+            if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= bossShootCooldownMillis) {
+                Gdx.app.log("Firing", "");
+                hasFired = true;
+                timeElapsedSinceLastCalled = timeElapsedWhenCalled;
+                switchSprite(true);
+                bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET_BOSS));
+            } else {
+                Gdx.app.log("Not firing", "");
+                switchSprite(false);
+            }
             for (int i = 0; i < bullets.size(); i++) {
                 if (bullets.get(i).hasExpired()) {
                     bullets.remove(bullets.get(i));
                     continue;
                 }
             }
-        } else {
-            switchSprite(false);
         }
     }
 

@@ -328,7 +328,7 @@ class GameScreen implements Screen, InputProcessor {
 
             } else {
                 enemy.move(deltaTime);
-                enemy.update(deltaTime);
+                enemy.update(deltaTime, timeElapsed);
 
                 // Check if enemy's bullets hit player
                 for (int j = 0; j < enemy.bullets.size(); j++) {
@@ -397,14 +397,20 @@ class GameScreen implements Screen, InputProcessor {
         player.move(deltaTime);
         player.update(timeElapsed);
         // Spawn enemy once start hint has been dismissed
-        if (player.hasFired() && enemies.size() < enemiesMax) {
+        Enemy newEnemy;
+        if (levelCounter % 1 == 0 && enemies.size() < 1) {
+            newEnemy = new Enemy(Enemy.EnemyKind.BOSS);
+            float enemyStartX =  camera.position.x / 2 - 60f;
+            float enemyStartY = -camera.position.y / 2f + newEnemy.getHeight();
+
+            newEnemy.setPos(camera, enemyStartX, enemyStartY);
+            enemies.add(newEnemy);
+        }
+        else if (player.hasFired() && enemies.size() < enemiesMax && levelCounter % 1 != 0) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
-                Enemy newEnemy;
                 rnd = MathUtils.random(1, 100);
-                if (rnd <= Constants.SPAWN_RATE_BOSS) {
-                    newEnemy = new Enemy(Enemy.EnemyKind.BOSS);
-                } else if (rnd < Constants.SPAWN_RATE_BOUNTY) {
+                if (rnd < Constants.SPAWN_RATE_BOUNTY) {
                     newEnemy = new Enemy(Enemy.EnemyKind.BOUNTY);
                 } else {
                     newEnemy = new Enemy(Enemy.EnemyKind.NORMAL);
@@ -473,12 +479,12 @@ class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        initial.dispose();
-        bgm.dispose();
-        backToMenuButton.dispose();
-        resumeButton.dispose();
-        pauseButton.dispose();
+//        batch.dispose();
+//        initial.dispose();
+//        bgm.dispose();
+//        backToMenuButton.dispose();
+//        resumeButton.dispose();
+//        pauseButton.dispose();
         for (int i = enemies.size() - 1; i >= 0; i--) {
             Enemy enemy = enemies.remove(i);
         }
