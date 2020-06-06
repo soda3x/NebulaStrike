@@ -123,7 +123,7 @@ public class GameOverScreen implements Screen, InputProcessor {
         backToMenuButton.setSound(Constants.BUTTON_SND_1);
 
         // Create background music and init it
-        if (score != null) {
+        if (newHighScore) {
             menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMEOVER_WIN_MUSIC));
         } else {
             menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMEOVER_FAIL_MUSIC));
@@ -210,6 +210,7 @@ public class GameOverScreen implements Screen, InputProcessor {
             backToMenuActive = true;
 
         } else if (backToMenuActive) {
+            menuMusic.stop();
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getMenuScreen());
         }
 
@@ -217,6 +218,7 @@ public class GameOverScreen implements Screen, InputProcessor {
             menuMusic.stop();
             playAgainActive = true;
         } else if (playAgainActive) {
+            menuMusic.stop();
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameScreen());
         }
 

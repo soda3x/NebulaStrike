@@ -146,10 +146,13 @@ public class MenuScreen implements Screen, InputProcessor {
 
         } else if (startActive) {
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameScreen());
+            menuMusic.stop();
         } else if (creditActive) {
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getCreditsScreen());
+            menuMusic.stop();
         } else if (scoreboardActive) {
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getScoreScreen());
+            menuMusic.stop();
         } else if (quitActive) {
             Gdx.app.exit();
         }

@@ -41,9 +41,11 @@ public class Enemy {
     private Vector2 velocity;
     private boolean hasFired;
     private long timeElapsedSinceLastCalled;
-    private final long shootCooldownMillis = 300;
-    private final long bossShootCooldownMillis = 2000;
+    private long timeElapsedSinceBossFired;
+    private final long shootCooldownMillis = 400;
+    private final long bossShootCooldownMillis = 2310;
     private int health = 1;
+    private boolean bossFinishedShooting;
 
     public ArrayList<Bullet> bullets;
 
@@ -54,6 +56,8 @@ public class Enemy {
         this.velocity = new Vector2();
         this.sprite = new Sprite();
         this.dead = false;
+        this.bossFinishedShooting = true;
+        this.timeElapsedSinceBossFired = System.currentTimeMillis();
 
         this.initSprite();
         this.switchSprite(false);
@@ -66,6 +70,7 @@ public class Enemy {
         switch (enemykind) {
             case NORMAL:
                 enemySheet = new Texture(Constants.ENEMY_NORMAL_SPRITESHEET);
+                this.health = 1;
                 break;
             case BOSS:
                 enemySheet = new Texture(Constants.ENEMY_BOSS_SPRITESHEET);
@@ -73,6 +78,7 @@ public class Enemy {
                 break;
             case BOUNTY:
                 enemySheet = new Texture(Constants.ENEMY_BOUNTY_SPRITESHEET);
+                this.health = 2;
                 break;
         }
         TextureRegion[][] temp = TextureRegion.split(enemySheet, enemySheet.getWidth() / COLUMNS, enemySheet.getHeight() / ROWS);
@@ -170,9 +176,9 @@ public class Enemy {
         }
 
         // enemies move toward to player
-        if (this.x > g.getPlayer().getX()) {
+        if ((this.x + 50) > g.getPlayer().getX()) {
             movement.x -= 1;
-        } else if (this.x < g.getPlayer().getX()) {
+        } else if ((this.x + 50) < g.getPlayer().getX()) {
             movement.x += 1;
         }
 
@@ -193,8 +199,9 @@ public class Enemy {
             }
         }
 
-        if (enemykind == EnemyKind.BOSS && firingTimer(System.currentTimeMillis())) {
-            this.setX(velocity.x * deltaTime + getX());
+        this.setX(velocity.x * deltaTime + getX());
+
+        if (enemykind != EnemyKind.BOSS) {
             this.setY(velocity.y * deltaTime + getY());
         }
 
@@ -215,16 +222,23 @@ public class Enemy {
         }
     }
 
-    private boolean firingTimer(long timeElapsedWhenCalled) {
-        if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= shootCooldownMillis) {
+    private boolean firingTimer(EnemyKind kind, long timeElapsedWhenCalled) {
+        long cooldown = 0;
+
+        if (kind != EnemyKind.BOSS) {
+            cooldown = shootCooldownMillis;
+        } else {
+            cooldown = bossShootCooldownMillis;
+        }
+
+        if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= cooldown) {
             timeElapsedSinceLastCalled = timeElapsedWhenCalled;
             return true;
         }
-        timeElapsedSinceLastCalled = timeElapsedWhenCalled;
         return false;
     }
 
-    public void update(float deltaTime, long timeElapsedWhenCalled) {
+    public void update(float deltaTime, OrthographicCamera camera) {
         // Move bullets
         for (Bullet bullet : bullets) {
             bullet.update(deltaTime);
@@ -254,31 +268,33 @@ public class Enemy {
                 for (int i = 0; i < bullets.size(); i++) {
                     if (bullets.get(i).hasExpired()) {
                         bullets.remove(bullets.get(i));
-                        continue;
                     }
                 }
             } else {
-                if (firingTimer(System.currentTimeMillis())) switchSprite(false);
-            }
-            // boss attack logic
-        } else {
-            if (timeElapsedWhenCalled - timeElapsedSinceLastCalled >= bossShootCooldownMillis) {
-                Gdx.app.log("Firing", "");
-                hasFired = true;
-                timeElapsedSinceLastCalled = timeElapsedWhenCalled;
-                switchSprite(true);
-                bullets.add(new Bullet(Bullet.BulletOwner.ENEMY, this.getX(), this.getY(), Constants.ENEMY_BULLET_BOSS));
-            } else {
-                Gdx.app.log("Not firing", "");
-                switchSprite(false);
-            }
-            for (int i = 0; i < bullets.size(); i++) {
-                if (bullets.get(i).hasExpired()) {
-                    bullets.remove(bullets.get(i));
-                    continue;
+                if (firingTimer(this.enemykind, System.currentTimeMillis())) {
+                    switchSprite(false);
                 }
             }
+        } else {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - timeElapsedSinceBossFired >= 3000) {
+                long time = System.currentTimeMillis();
+                for (int i = 0; i < 200; ++i) {
+                    bullets.add(new Bullet(Bullet.BulletOwner.BOSS, this.getX(), (-camera.position.y / 2f + this.getHeight()) + i, Constants.ENEMY_BULLET_BOSS));
+                }
+                Sound snd = Gdx.audio.newSound(Gdx.files.internal("sound/boss_blast.mp3"));
+                snd.play();
+                timeElapsedSinceBossFired = currentTime;
+            }
         }
+    }
+
+    public int getHealth() {
+        return this.health;
+    }
+
+    public void setHealth(int h) {
+        this.health = h;
     }
 
     public boolean hasFired() {
@@ -294,6 +310,9 @@ public class Enemy {
     }
 
     public Rectangle getBoundingRectangle() {
+        if (enemykind == EnemyKind.BOSS) {
+            return new Rectangle(this.getX() + 50, this.getY() + 100, getWidth() - 100, getHeight() - 200);
+        }
         return new Rectangle(this.getX() + 20, this.getY() + 22, getWidth() / 3f, getHeight() / 3f);
     }
 

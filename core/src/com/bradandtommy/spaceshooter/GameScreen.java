@@ -232,6 +232,7 @@ class GameScreen implements Screen, InputProcessor {
             sr.setAutoShapeType(true);
             // Get players hitbox
             sr.rect(this.player.getBoundingRectangle().getX(), this.player.getBoundingRectangle().getY(), this.player.getBoundingRectangle().getWidth(), this.player.getBoundingRectangle().getHeight());
+
             // Get spawned player bullets hitboxes
             for (int i = 0; i < player.getSpawnedBullets().size(); i++) {
                 sr.rect(this.player.getSpawnedBullets().get(i).getBoundingRectangle().getX(),
@@ -239,7 +240,25 @@ class GameScreen implements Screen, InputProcessor {
                         this.player.getSpawnedBullets().get(i).getBoundingRectangle().getWidth(),
                         this.player.getSpawnedBullets().get(i).getBoundingRectangle().getHeight());
             }
-            sr.end();
+
+            // Get enemy hitboxes
+            for (int i = 0; i < enemies.size(); ++i) {
+                sr.rect(enemies.get(i).getBoundingRectangle().getX(),
+                        enemies.get(i).getBoundingRectangle().getY(),
+                        enemies.get(i).getBoundingRectangle().getWidth(),
+                        enemies.get(i).getBoundingRectangle().getHeight());
+            }
+
+            // Get enemy bullet hitboxes
+            for (int i = 0; i < enemies.size(); ++i) {
+                for (int j = 0; j < enemies.get(i).bullets.size(); ++j) {
+                    sr.rect(enemies.get(i).bullets.get(j).getBoundingRectangle().getX(),
+                            enemies.get(i).bullets.get(j).getBoundingRectangle().getY(),
+                            enemies.get(i).bullets.get(j).getBoundingRectangle().getWidth(),
+                            enemies.get(i).bullets.get(j).getBoundingRectangle().getHeight());
+                }
+                sr.end();
+            }
         }
     }
 
@@ -254,6 +273,8 @@ class GameScreen implements Screen, InputProcessor {
             resumeActive = true;
 
         } else if (backToMenuActive) {
+            bgm.stop();
+            initial.stop();
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getMenuScreen());
         } else if (resumeActive) {
             resumeActive = false;
@@ -281,11 +302,21 @@ class GameScreen implements Screen, InputProcessor {
 
         if (gameState == GameState.FAIL) {
 
+            if (initial.isPlaying()) {
+                initial.stop();
+            }
+
+            if (bgm.isPlaying()) {
+                bgm.stop();
+            }
+
             ScoreIO scoreIO = new ScoreIO();
             for (Score score : scoreIO.getScores()) {
                 if (new Score("newScore", levelCounter - 1, scoreCounter).higherScoreThan(score)) {
                     // Pass in score to get new high score screen
                     this.spawnedGameOverScreen = true;
+                    initial.stop();
+                    bgm.stop();
                     SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, true));
                     break;
                 } else {
@@ -294,6 +325,8 @@ class GameScreen implements Screen, InputProcessor {
             }
             // Generic game over screen
             if (!spawnedGameOverScreen) {
+                initial.stop();
+                bgm.stop();
                 Score score = new Score("NONAME", levelCounter - 1, scoreCounter);
                 SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, false));
             }
@@ -328,7 +361,7 @@ class GameScreen implements Screen, InputProcessor {
 
             } else {
                 enemy.move(deltaTime);
-                enemy.update(deltaTime, timeElapsed);
+                enemy.update(deltaTime, camera);
 
                 // Check if enemy's bullets hit player
                 for (int j = 0; j < enemy.bullets.size(); j++) {
@@ -358,26 +391,38 @@ class GameScreen implements Screen, InputProcessor {
                     }
 
                     if (player.bullets.get(k).getBoundingRectangle().overlaps(enemy.getBoundingRectangle())) {
+                        enemy.setHealth(enemy.getHealth() - 1);
+
                         Sound enemyHitSound = Gdx.audio.newSound(Gdx.files.internal(Constants.HIT_SND));
                         enemyHitSound.play();
-                        enemy.dead = true;
 
-                        // Calculate score and life
-                        switch (enemy.enemykind) {
-                            case NORMAL:
-                                scoreCounter += 50;
-                                break;
-                            case BOSS:
-                                scoreCounter += 200;
-                                break;
-                            case BOUNTY:
-                                scoreCounter += 100;
-                                if (lives == Constants.PLAYER_MAX_LIVES) {
-                                    scoreCounter += 500;
-                                } else {
-                                    lives += 1;
-                                }
-                                break;
+                        if (enemy.getHealth() < 1) {
+                            enemy.dead = true;
+                            if (enemy.enemykind == Enemy.EnemyKind.BOSS) {
+                                Sound snd = Gdx.audio.newSound(Gdx.files.internal("sound/boss_death.mp3"));
+                            }
+                        }
+
+                        if (enemy.isDead()) {
+                            // Calculate score and life
+                            switch (enemy.enemykind) {
+                                case NORMAL:
+                                    scoreCounter += 50;
+                                    break;
+                                case BOSS:
+                                    scoreCounter += 200;
+                                    break;
+                                case BOUNTY:
+                                    scoreCounter += 100;
+                                    if (lives == Constants.PLAYER_MAX_LIVES) {
+                                        scoreCounter += 500;
+                                    } else {
+                                        lives += 1;
+                                        Sound lifeUp = Gdx.audio.newSound(Gdx.files.internal("sound/health_up.mp3"));
+                                        lifeUp.play();
+                                    }
+                                    break;
+                            }
                         }
                         player.bullets.get(k).setExpired(true);
                     }
@@ -388,9 +433,11 @@ class GameScreen implements Screen, InputProcessor {
             }
         }
         // Move to next level if all enemies are dead
-        if (player.hasFired() && aliveEnemies == 0 && enemies.size() == enemiesMax) {
+        if (player.hasFired() && aliveEnemies == 0 && (enemies.size() == enemiesMax || levelCounter % 3 == 0)) {
             enemies.clear();
             levelCounter += 1;
+            Sound levelUp = Gdx.audio.newSound(Gdx.files.internal("sound/level_up.mp3"));
+            levelUp.play();
             enemiesMax = MathUtils.round(levelCounter * Constants.ENEMY_NUMBER_BASE / 2);
         }
 
@@ -398,7 +445,7 @@ class GameScreen implements Screen, InputProcessor {
         player.update(timeElapsed);
         // Spawn enemy once start hint has been dismissed
         Enemy newEnemy;
-        if (levelCounter % 1 == 0 && enemies.size() < 1) {
+        if (levelCounter % 3 == 0 && enemies.size() < 1) {
             newEnemy = new Enemy(Enemy.EnemyKind.BOSS);
             float enemyStartX =  camera.position.x / 2 - 60f;
             float enemyStartY = -camera.position.y / 2f + newEnemy.getHeight();
@@ -406,7 +453,7 @@ class GameScreen implements Screen, InputProcessor {
             newEnemy.setPos(camera, enemyStartX, enemyStartY);
             enemies.add(newEnemy);
         }
-        else if (player.hasFired() && enemies.size() < enemiesMax && levelCounter % 1 != 0) {
+        else if (player.hasFired() && enemies.size() < enemiesMax && levelCounter % 3 != 0) {
             int rnd = MathUtils.random(1, 20);
             if (rnd == 10) {
                 rnd = MathUtils.random(1, 100);
@@ -582,6 +629,14 @@ class GameScreen implements Screen, InputProcessor {
             case FAIL:
                 // Set the state of restartButton or backToMenuButton to up
                 backToMenuButton.update(false, screenX, screenY);
+
+                if (bgm.isPlaying()) {
+                    bgm.stop();
+                }
+
+                if (initial.isPlaying()) {
+                    initial.stop();
+                }
                 break;
 
             case PAUSE:

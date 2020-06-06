@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Bullet {
     // The enum for owner of bullets
-    public enum BulletOwner { PLAYER, ENEMY }
+    public enum BulletOwner { PLAYER, ENEMY, BOSS }
 
     public static final int SPEED = 250;
     private Sprite sprite;
@@ -58,6 +58,9 @@ public class Bullet {
     public float getHeight() { return sprite.getHeight(); }
 
     public Rectangle getBoundingRectangle() {
+        if (owner == BulletOwner.BOSS) {
+            return new Rectangle(this.getX() + 64, this.getY(), sprite.getWidth() - 128, sprite.getHeight());
+        }
         return new Rectangle(this.getX() + 15, this.getY() + 20, sprite.getWidth() - 30f, sprite.getHeight() - 50);
     }
 
