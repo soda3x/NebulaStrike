@@ -34,6 +34,7 @@ class GameScreen implements Screen, InputProcessor {
     private Player player;
     private Music initial;
     private Music bgm;
+    private Music boss;
     private Sound tutorialSpeech;
     private boolean showHitboxes = false;
     private InputPoller input;
@@ -96,6 +97,8 @@ class GameScreen implements Screen, InputProcessor {
         buttonLongDownTexture = new Texture(Constants.BUTTON_LONG_DOWN_TEXTURE_FILENAME);
         float buttonX = (Gdx.graphics.getHeight() - Constants.BUTTON_WIDTH) / 2;
         float buttonY = 0f;
+
+        boss = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_BOSS_LOOP));
 
         //restartButton.setSound(NEWGAME_SOUND_FILENAME);
         // Button to back to main menu
@@ -291,6 +294,15 @@ class GameScreen implements Screen, InputProcessor {
 
     private void update(float deltaTime) {
 
+        if (levelCounter % 3 == 0) {
+            if (initial.isPlaying()) {
+                initial.pause();
+            } else {
+                bgm.pause();
+            }
+            boss.play();
+        }
+
         if (!musicConfigured && player.hasFired()) {
             this.configureMusic();
             tutorialSpeech.stop();
@@ -317,6 +329,7 @@ class GameScreen implements Screen, InputProcessor {
                     this.spawnedGameOverScreen = true;
                     initial.stop();
                     bgm.stop();
+                    boss.stop();
                     SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, true));
                     break;
                 } else {
@@ -327,6 +340,7 @@ class GameScreen implements Screen, InputProcessor {
             if (!spawnedGameOverScreen) {
                 initial.stop();
                 bgm.stop();
+                boss.stop();
                 Score score = new Score("NONAME", levelCounter - 1, scoreCounter);
                 SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, false));
             }
@@ -400,6 +414,8 @@ class GameScreen implements Screen, InputProcessor {
                             enemy.dead = true;
                             if (enemy.enemykind == Enemy.EnemyKind.BOSS) {
                                 Sound snd = Gdx.audio.newSound(Gdx.files.internal("sound/boss_death.mp3"));
+                                boss.stop();
+                                bgm.play();
                             }
                         }
 
@@ -526,12 +542,12 @@ class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-//        batch.dispose();
-//        initial.dispose();
-//        bgm.dispose();
-//        backToMenuButton.dispose();
-//        resumeButton.dispose();
-//        pauseButton.dispose();
+        batch.dispose();
+        initial.dispose();
+        bgm.dispose();
+        backToMenuButton.dispose();
+        resumeButton.dispose();
+        pauseButton.dispose();
         for (int i = enemies.size() - 1; i >= 0; i--) {
             Enemy enemy = enemies.remove(i);
         }

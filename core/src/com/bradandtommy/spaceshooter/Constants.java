@@ -25,9 +25,11 @@ public class Constants {
     public static final String SCOREBOARD_MUSIC_FILENAME = "music/scores.mp3";
     public static final String GAMESCREEN_INITIAL_MUSIC = "music/start.mp3";
     public static final String GAMESCREEN_MUSIC_LOOP = "music/level.mp3";
+    public static final String GAMESCREEN_BOSS_LOOP = "music/boss.mp3";
     public static final String GAMEOVER_FAIL_MUSIC = "music/gameover.mp3";
     public static final String GAMEOVER_WIN_MUSIC = "music/gameover_newscore.mp3";
-    public static final float MUSIC_VOLUME = 1f;
+    public static final String CREDITS_MUSIC_LOOP = "music/credits.mp3";
+    public static final float MUSIC_VOLUME = 0.75f;
 
     // The constants for font
     public static final String FONT_FONT_FILENAME = "good_neighbors.fnt";

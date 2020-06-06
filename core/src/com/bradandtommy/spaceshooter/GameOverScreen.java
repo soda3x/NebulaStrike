@@ -9,8 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.util.ArrayList;
-
 public class GameOverScreen implements Screen, InputProcessor {
     private SpriteBatch batch;
 
@@ -29,7 +27,7 @@ public class GameOverScreen implements Screen, InputProcessor {
     private Button playAgainButton;
 
     // Music
-    private Music menuMusic;
+    private Music gameOverMusic;
 
     // Score
     private Score score;
@@ -124,13 +122,13 @@ public class GameOverScreen implements Screen, InputProcessor {
 
         // Create background music and init it
         if (newHighScore) {
-            menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMEOVER_WIN_MUSIC));
+            gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMEOVER_WIN_MUSIC));
         } else {
-            menuMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMEOVER_FAIL_MUSIC));
+            gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMEOVER_FAIL_MUSIC));
         }
-        menuMusic.setLooping(false);
-        menuMusic.play();
-        menuMusic.setVolume(Constants.MUSIC_VOLUME);
+        gameOverMusic.setLooping(false);
+        gameOverMusic.play();
+        gameOverMusic.setVolume(Constants.MUSIC_VOLUME);
 
         // Enable receiving all touch and key input events
         Gdx.input.setInputProcessor(this);
@@ -206,19 +204,19 @@ public class GameOverScreen implements Screen, InputProcessor {
 
         // Process user's selected action presented through buttons' state
         if (backToMenuButton.isDown) {
-            menuMusic.stop();
+            gameOverMusic.stop();
             backToMenuActive = true;
 
         } else if (backToMenuActive) {
-            menuMusic.stop();
+            gameOverMusic.stop();
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getMenuScreen());
         }
 
         if (playAgainButton.isDown) {
-            menuMusic.stop();
+            gameOverMusic.stop();
             playAgainActive = true;
         } else if (playAgainActive) {
-            menuMusic.stop();
+            gameOverMusic.stop();
             SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameScreen());
         }
 
@@ -315,7 +313,7 @@ public class GameOverScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-
+        gameOverMusic.dispose();
     }
 
     @Override
