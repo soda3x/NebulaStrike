@@ -314,6 +314,9 @@ public class GameOverScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         gameOverMusic.dispose();
+        playAgainButton.dispose();
+        backToMenuButton.dispose();
+        batch.dispose();
     }
 
     @Override

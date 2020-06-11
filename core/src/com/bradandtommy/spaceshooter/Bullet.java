@@ -67,4 +67,8 @@ public class Bullet {
     public void setExpired(boolean expired){
         this.expired = expired;
     }
+
+    public void dispose() {
+        sprite.getTexture().dispose();
+    }
 }

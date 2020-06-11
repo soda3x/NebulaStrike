@@ -118,7 +118,11 @@ class CreditsScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-
+        creditsMusic.dispose();
+        batch.dispose();
+        creditsTitleFont.dispose();
+        creditsFont.dispose();
+        backToMenuButton.dispose();
     }
 
     @Override

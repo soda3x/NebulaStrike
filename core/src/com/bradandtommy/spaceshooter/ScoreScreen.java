@@ -189,7 +189,9 @@ class ScoreScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-
+        backToMenuButton.dispose();
+        menuMusic.dispose();
+        batch.dispose();
     }
 
     /**

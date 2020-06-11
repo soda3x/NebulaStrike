@@ -36,8 +36,10 @@ class ScoreIO {
             }
             for (String stringScore : stringScores) {
                 String[] tokenizedScore = stringScore.split(",");
-                Score score = new Score(tokenizedScore[0], Long.parseLong(tokenizedScore[1].trim()), Long.parseLong(tokenizedScore[2].trim()));
-                scores.add(score);
+                if (tokenizedScore.length == 3) {       // ADDED BY TOMMY
+                        Score score = new Score(tokenizedScore[0], Long.parseLong(tokenizedScore[1].trim()), Long.parseLong(tokenizedScore[2].trim()));
+                        scores.add(score);
+                }                                       // QQQ
             }
         } else {
             Gdx.app.log("DEBUG", "Scores file not found, creating a new one");

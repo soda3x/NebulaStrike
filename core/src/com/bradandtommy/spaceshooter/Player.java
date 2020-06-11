@@ -208,6 +208,14 @@ public class Player {
         return bullets;
     }
 
-
-
+    public void dispose(){
+        this.sprite.getTexture().dispose();
+        this.bullets = new ArrayList<Bullet>();
+        Bullet bullet;
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            bullet = bullets.remove(i);
+            bullet.dispose();
+        }
+        playerSheet.dispose();
+    }
 }

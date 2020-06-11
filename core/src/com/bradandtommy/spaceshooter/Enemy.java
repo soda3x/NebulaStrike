@@ -316,4 +316,14 @@ public class Enemy {
         return new Rectangle(this.getX() + 20, this.getY() + 22, getWidth() / 3f, getHeight() / 3f);
     }
 
+    public void dispose(){
+        this.sprite.getTexture().dispose();
+        this.bullets = new ArrayList<Bullet>();
+        Bullet bullet;
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            bullet = bullets.remove(i);
+            bullet.dispose();
+        }
+        enemySheet.dispose();
+    }
 }

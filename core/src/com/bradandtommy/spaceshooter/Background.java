@@ -25,7 +25,6 @@ public class Background {
         return instance;
     }
 
-
     public void create() {
         this.bg1 = new Texture(Gdx.files.internal(Constants.SCROLLING_BG_IMAGE));
         this.bg2 = new Texture(Gdx.files.internal(Constants.SCROLLING_BG_IMAGE));
@@ -48,5 +47,13 @@ public class Background {
         batch.end();
     }
 
+    public void dispose(){
 
+        if (instance == null) {
+            instance.dispose();
+        }
+
+        bg1.dispose();
+        bg2.dispose();
+    }
 }

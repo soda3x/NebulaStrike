@@ -322,6 +322,11 @@ class GameScreen implements Screen, InputProcessor {
                 bgm.stop();
             }
 
+            // ADDED BY TOMMY
+            if (boss.isPlaying()) {
+                boss.stop();
+            }
+
             ScoreIO scoreIO = new ScoreIO();
             for (Score score : scoreIO.getScores()) {
                 if (new Score("newScore", levelCounter - 1, scoreCounter).higherScoreThan(score)) {
@@ -345,6 +350,7 @@ class GameScreen implements Screen, InputProcessor {
                 SpaceShooter.getSpaceShooterInstance().setScreen(SpaceShooter.getSpaceShooterInstance().getGameOverScreen(score, false));
             }
 
+            // Considered to be deleted *
             this.dispose();
         }
 
@@ -365,6 +371,7 @@ class GameScreen implements Screen, InputProcessor {
 
             Enemy enemy = enemies.get(i);
           
+            // NEED TO BE RECONSIDERED - as it is redundant with the if statement below
             if (enemy.getY() <= 0) {
                 enemy.setPos(camera, enemy.getX(), - Gdx.graphics.getHeight() / 2f + enemy.getHeight() / 2);
             }
@@ -372,7 +379,6 @@ class GameScreen implements Screen, InputProcessor {
             // De-spawn enemies when they leave bottom of screen
             if (enemy.getY() + enemy.getHeight() <= 0) {
                 enemy.dead = true;
-
             } else {
                 enemy.move(deltaTime);
                 enemy.update(deltaTime, camera);
@@ -542,15 +548,23 @@ class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        initial.dispose();
-        bgm.dispose();
-        backToMenuButton.dispose();
-        resumeButton.dispose();
-        pauseButton.dispose();
-        for (int i = enemies.size() - 1; i >= 0; i--) {
-            Enemy enemy = enemies.remove(i);
+        if (batch != null) {            // MODIFIED BY TOMMY * - Method create() has been called
+            batch.dispose();
+            tutorialSpeech.dispose();
+            boss.dispose();
+            backToMenuButton.dispose();
+            resumeButton.dispose();
+            pauseButton.dispose();
+            for (int i = enemies.size() - 1; i >= 0; i--) {
+                Enemy enemy = enemies.remove(i);
+            }
         }
+
+        if (initial != null) {      // MODIFIED BY TOMMY * - Method configueMusic() has been called
+            initial.dispose();
+            bgm.dispose();
+        }
+
     }
 
     public Player getPlayer() {
@@ -605,7 +619,10 @@ class GameScreen implements Screen, InputProcessor {
         switch (gameState) {
             case PLAYING:
                 // Check if the pauseButton is down based on the touched point's coordinate
-                pauseButton.update(true, screenX, screenY);
+                if (player.hasFired()) {    // MODIFIED BY TOMMY * - If Pause button is visible
+                    pauseButton.update(true, screenX, screenY);
+                }
+
                 break;
 
             case FAIL:
