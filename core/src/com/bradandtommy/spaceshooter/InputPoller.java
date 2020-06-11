@@ -6,7 +6,7 @@ import com.badlogic.gdx.Input;
 import java.util.ArrayList;
 
 /**
- * Represent the input poller
+ * Class for listening to specific keyboard events related to gameplay
  */
 public class InputPoller {
 
@@ -38,28 +38,28 @@ public class InputPoller {
         }
 
         /**
-         *
-         * @return
+         * Return whether key pressed or not
+         * @return boolean pressed
          */
         public boolean pressed() {
             return isDown && !prev;
         }
     }
 
-    //
+    // Collection of actions
     public ArrayList<Action> actions = new ArrayList<Action>();
 
-    //
+    // Actions for movement
     public Action moveUp = new Action(Input.Keys.W);
     public Action moveDown = new Action(Input.Keys.S);
     public Action moveLeft = new Action(Input.Keys.A);
     public Action moveRight = new Action(Input.Keys.D);
 
-    //
+    // Action for shooting
     public Action shoot = new Action(Input.Keys.SPACE);
 
     /**
-     *
+     * Poll for user input
      */
     public void poll() {
         for (Action a: actions) {

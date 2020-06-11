@@ -6,12 +6,12 @@ import com.badlogic.gdx.Input;
 import java.util.ArrayList;
 
 /**
- * Class used to store all alphabetic characters for score entry
+ * Class used to listen for alphabetical keyboard input for score entry
  */
 public class AlphaInputPoller {
 
     /**
-     *
+     * Class to contain keyboard event
      */
     public class Action {
 
@@ -21,7 +21,7 @@ public class AlphaInputPoller {
         public int key;
 
         /**
-         *
+         * Constructor to add action to actions list
          * @param key
          */
         public Action(int key) {
@@ -30,7 +30,7 @@ public class AlphaInputPoller {
         }
 
         /**
-         *
+         * Poll for user input
          */
         public void poll() {
             prev = isDown;
@@ -38,18 +38,18 @@ public class AlphaInputPoller {
         }
 
         /**
-         *
-         * @return
+         * Check if button pressed or not
+         * @return pressed state
          */
         public boolean pressed() {
             return isDown && !prev;
         }
     }
 
-    //
+    // init list of keyboard actions
     public ArrayList<AlphaInputPoller.Action> actions = new ArrayList<AlphaInputPoller.Action>();
 
-    //
+    // Add alphabet to array
     public AlphaInputPoller.Action a = new AlphaInputPoller.Action(Input.Keys.A);
     public AlphaInputPoller.Action b = new AlphaInputPoller.Action(Input.Keys.B);
     public AlphaInputPoller.Action c = new AlphaInputPoller.Action(Input.Keys.C);
@@ -80,7 +80,7 @@ public class AlphaInputPoller {
     public AlphaInputPoller.Action confirm = new AlphaInputPoller.Action(Input.Keys.ENTER);
 
     /**
-     *
+     * Poll for user input
      */
     public void poll() {
         for (AlphaInputPoller.Action a: actions) {
@@ -89,7 +89,7 @@ public class AlphaInputPoller {
     }
 
     /**
-     *
+     * Pass in string to replace with based on keyboard input
      * @param field
      */
     public void stringBuffer(String[] field) {
