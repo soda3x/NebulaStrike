@@ -10,14 +10,30 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.awt.Menu;
 
+/**
+ *
+ */
 public class SpaceShooter extends Game implements ApplicationListener {
+
+	// Sprite batch
 	private SpriteBatch batch;
+
+	// Image
 	private Texture img;
+
+	// SpaceShooter instance
 	private static SpaceShooter instance;
 
+	// Class with the game
 	private GameScreen gameScreen;
+
+	// Class with the menu
 	private MenuScreen menuScreen;
+
+	// Class with the credit
 	private CreditsScreen creditsScreen;
+
+	// Class with the score
 	private ScoreScreen scoreScreen;
 
 	/**
@@ -45,28 +61,24 @@ public class SpaceShooter extends Game implements ApplicationListener {
 		}
 		return instance;
 	}
-	
+
+	/**
+	 * Create necessary objects and set default screen
+	 */
 	@Override
 	public void create () {
-		// Set window title
-//		Gdx.graphics.setTitle("Nebula Strike");
-
 		// Change screens to the menu
 		this.setScreen(menuScreen);
 	}
 
-	GameScreen getGameScreen() {
-		return gameScreen;
-	}
-	MenuScreen getMenuScreen() {
-		return menuScreen;
-	}
+	/**
+	 * Retrieving the appropriated screen
+	 */
+	GameScreen getGameScreen() { return gameScreen; }
+	MenuScreen getMenuScreen() { return menuScreen; }
 	CreditsScreen getCreditsScreen() { return creditsScreen; }
 	ScoreScreen getScoreScreen() { return scoreScreen; }
-	GameOverScreen getGameOverScreen(Score score, boolean newHighScore) {
-	 		return new GameOverScreen(score, newHighScore);
-	 }
-
+	GameOverScreen getGameOverScreen(Score score, boolean newHighScore) { return new GameOverScreen(score, newHighScore); }
 
 	/**
 	 * This method calls the super class render

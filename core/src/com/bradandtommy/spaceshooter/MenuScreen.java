@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Represent menu screen
  */
 public class MenuScreen implements Screen, InputProcessor {
+
     // Sprite batch for drawing
     private SpriteBatch batch;
 

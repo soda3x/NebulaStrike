@@ -7,17 +7,34 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+/**
+ * Represent the game's background code
+ */
 public class Background {
 
+    // Background music
     private Texture bg1, bg2;
+
+    // Coordinate for scrolling background
     private float yMax, yCoordBg1, yCoordBg2;
+
+    // Constant for the scrolling background's speed
     private final int BG_MOVE_SPEED = 200;
+
+    // Background's instance
     private static Background instance;
 
+    /**
+     *  Background constructor
+     */
     private Background() {
         this.create();
     }
 
+    /**
+     * Get the class instance
+     * @return the background instance
+     */
     public static Background getBackgroundInstance() {
         if (instance == null) {
             instance = new Background();
@@ -26,6 +43,9 @@ public class Background {
     }
 
 
+    /**
+     * Create the scrolling background
+     */
     public void create() {
         this.bg1 = new Texture(Gdx.files.internal(Constants.SCROLLING_BG_IMAGE));
         this.bg2 = new Texture(Gdx.files.internal(Constants.SCROLLING_BG_IMAGE));
@@ -34,6 +54,10 @@ public class Background {
         this.yCoordBg2 = yMax;
     }
 
+    /**
+     * Updating the scrolling background
+     * @param batch sprite batch
+     */
     public void update(SpriteBatch batch) {
         yCoordBg1 -= BG_MOVE_SPEED * Gdx.graphics.getDeltaTime();
         yCoordBg2 = yCoordBg1 - yMax;  // We move the background, not the camera

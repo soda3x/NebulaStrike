@@ -24,23 +24,41 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import java.util.ArrayList;
 
 class GameScreen implements Screen, InputProcessor {
+
     // The enum for states of the game
     public enum GameState { PLAYING, FAIL, PAUSE };
 
+    // Sprite batch, skin, stage and orthographic camera
     private SpriteBatch batch;
     private Skin skin;
     private Stage stage;
     private OrthographicCamera camera;
+
+    // Player
     private Player player;
+
+    // Music
     private Music initial;
     private Music bgm;
     private Music boss;
+
+    // Tuttorial speech
     private Sound tutorialSpeech;
+
+    // Show hit box flag
     private boolean showHitboxes = false;
+
+    // Input
     private InputPoller input;
+
+    // Score and level counter
     private long scoreCounter;
     private long levelCounter;
+
+    // Lives for both enemies and player
     private int lives;
+
+    // Time elapsed
     private long timeElapsed;
 
     //Buttons
@@ -54,16 +72,21 @@ class GameScreen implements Screen, InputProcessor {
     private boolean pauseActive;
     private boolean musicConfigured;
 
+    // Spawning game over screen flag
     private boolean spawnedGameOverScreen;
 
     // The game's current state
     public GameState gameState;
 
+    // List of enemies
     private ArrayList<Enemy> enemies;
 
-    // ADDED BY TOMMY
+    // Maximum number of enemies appearing in a level
     private int enemiesMax;
 
+    /**
+     * Create necessary object and do some appropriate setup
+     */
     private void create() {
         this.musicConfigured = false;
         this.spawnedGameOverScreen = false;
@@ -100,19 +123,14 @@ class GameScreen implements Screen, InputProcessor {
 
         boss = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_BOSS_LOOP));
 
-        //restartButton.setSound(NEWGAME_SOUND_FILENAME);
         // Button to back to main menu
         backToMenuButton = new Button(buttonX, buttonY, Constants.BUTTON_WIDTH, Constants.BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
-        //backToMenuButton.setSound(RETURN_SOUND_FILENAME);
+
         // Button to resume
         resumeButton = new Button(buttonX, buttonY, Constants.BUTTON_WIDTH, Constants.BUTTON_HEIGHT, buttonLongTexture, buttonLongDownTexture);
-        //resumeButton.setSound(RESUME_SOUND_FILENAME);
 
-        // quitButton.setSound(ALERT_SOUND_FILENAME);
         // Button to pause
         pauseButton = new Button(Gdx.graphics.getWidth() - 50, 10, 32, 32, new Texture(Constants.BUTTON_PAUSE), new Texture(Constants.BUTTON_PAUSE_DOWN));
-
-        //------------------------------------
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
@@ -131,6 +149,9 @@ class GameScreen implements Screen, InputProcessor {
         Gdx.input.setInputProcessor(this);
     }
 
+    /**
+     * Adjusting and configuring the music
+     */
     public void configureMusic() {
         initial = Gdx.audio.newMusic(Gdx.files.internal(Constants.GAMESCREEN_INITIAL_MUSIC));
         initial.setLooping(false);
@@ -152,6 +173,10 @@ class GameScreen implements Screen, InputProcessor {
         this.musicConfigured = true;
     }
 
+    /**
+     * Main loop, call/do all logic and rendering.
+     * @param deltaTime delta time since the previous rendering time
+     */
     public void render(float deltaTime) {
 
         this.updatePause();
@@ -265,6 +290,9 @@ class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Updating the pause screen
+     */
     private void updatePause() {
         if (gameState != GameState.PAUSE) {
             return;
@@ -288,10 +316,20 @@ class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Game pausing flag
+     * @return the game pausing flag
+     */
     private boolean gameIsPaused() {
         return pauseActive || pauseButton.isDown;
     }
 
+    /**
+     * Method for all game logic.
+     * This method is called at the start of GameCore.render() before
+     * any actual drawing is done.
+     * @param deltaTime the delta time since the previous rendering time
+     */
     private void update(float deltaTime) {
 
         if (levelCounter % 3 == 0) {
@@ -448,6 +486,7 @@ class GameScreen implements Screen, InputProcessor {
                 aliveEnemies += 1;
             }
         }
+
         // Move to next level if all enemies are dead
         if (player.hasFired() && aliveEnemies == 0 && (enemies.size() == enemiesMax || levelCounter % 3 == 0)) {
             enemies.clear();
@@ -459,6 +498,7 @@ class GameScreen implements Screen, InputProcessor {
 
         player.move(deltaTime);
         player.update(timeElapsed);
+
         // Spawn enemy once start hint has been dismissed
         Enemy newEnemy;
         if (levelCounter % 3 == 0 && enemies.size() < 1) {
@@ -511,6 +551,7 @@ class GameScreen implements Screen, InputProcessor {
                 Gdx.files.internal(Constants.FONT_FONT_FILENAME),
                 Gdx.files.internal(Constants.FONT_IMAGE_FILENAME),
                 false);
+
         // Scale up the font slightly to make it more legible on larger screens for DEFAULT
         buttonFont.getData().setScale(2, 2);
 
@@ -540,6 +581,9 @@ class GameScreen implements Screen, InputProcessor {
         batch.end();
     }
 
+    /**
+     * Cleanup done after the game closes.
+     */
     @Override
     public void dispose() {
         batch.dispose();
@@ -553,8 +597,20 @@ class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Get the player
+     * @return the player
+     */
     public Player getPlayer() {
         return this.player;
+    }
+
+    /**
+     * Get the input poller
+     * @return the input poller
+     */
+    public InputPoller getInputPoller() {
+        return input;
     }
 
     @Override
@@ -677,9 +733,5 @@ class GameScreen implements Screen, InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
-    }
-
-    public InputPoller getInputPoller() {
-        return input;
     }
 }

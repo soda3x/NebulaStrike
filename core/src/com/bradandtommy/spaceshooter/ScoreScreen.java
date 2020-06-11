@@ -14,7 +14,12 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
+/**
+ * Represent score screen
+ */
 class ScoreScreen implements Screen, InputProcessor {
+
+    // Sprite batch
     private SpriteBatch batch;
 
     // Labels
@@ -34,6 +39,9 @@ class ScoreScreen implements Screen, InputProcessor {
     // Scores
     private ScoreIO scores;
 
+    /**
+     * Create and instantiate necessary objects
+     */
     private void create() {
         Background.getBackgroundInstance().create();
         // Font for name label and button
@@ -111,12 +119,20 @@ class ScoreScreen implements Screen, InputProcessor {
         batch = new SpriteBatch();
     }
 
+    /**
+     * Drawing the score
+     * @param batch sprite batch
+     */
     private void drawScores(SpriteBatch batch) {
         for (Label label : scoreLabels) {
             label.draw(batch);
         }
     }
 
+    /**
+     * Initialising the score
+     * @param font the letter font
+     */
     private void initScoreLabels(BitmapFont font) {
         // Prepare Labels for top 5 scores
         for (int i = 0; i < 5; ++i) {
@@ -134,9 +150,16 @@ class ScoreScreen implements Screen, InputProcessor {
 
     }
 
+    /**
+     * Show the score screen
+     */
     @Override
     public void show() { this.create(); }
 
+    /**
+     * Main game loop, call/do all logic and rendering.
+     * @param delta the delta time since the previous rendering time
+     */
     @Override
     public void render(float delta) {
         //Set background color and clear the screen

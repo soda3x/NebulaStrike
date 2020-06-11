@@ -7,32 +7,49 @@ import java.util.ArrayList;
 
 /**
  * Class used to store all alphabetic characters for score entry
- * It's gross but it works
  */
 public class AlphaInputPoller {
 
+    /**
+     *
+     */
     public class Action {
+
+        //
         public boolean isDown = false;
         public boolean prev = false;
         public int key;
 
+        /**
+         *
+         * @param key
+         */
         public Action(int key) {
             this.key = key;
             actions.add(this);
         }
 
+        /**
+         *
+         */
         public void poll() {
             prev = isDown;
             isDown = Gdx.input.isKeyPressed(key);
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean pressed() {
             return isDown && !prev;
         }
     }
 
+    //
     public ArrayList<AlphaInputPoller.Action> actions = new ArrayList<AlphaInputPoller.Action>();
 
+    //
     public AlphaInputPoller.Action a = new AlphaInputPoller.Action(Input.Keys.A);
     public AlphaInputPoller.Action b = new AlphaInputPoller.Action(Input.Keys.B);
     public AlphaInputPoller.Action c = new AlphaInputPoller.Action(Input.Keys.C);
@@ -62,13 +79,19 @@ public class AlphaInputPoller {
     public AlphaInputPoller.Action back = new AlphaInputPoller.Action(Input.Keys.BACKSPACE);
     public AlphaInputPoller.Action confirm = new AlphaInputPoller.Action(Input.Keys.ENTER);
 
+    /**
+     *
+     */
     public void poll() {
-
         for (AlphaInputPoller.Action a: actions) {
             a.poll();
         }
     }
 
+    /**
+     *
+     * @param field
+     */
     public void stringBuffer(String[] field) {
         if (this.a.pressed()) {
             for (int i = 0; i < field.length; ++i) {

@@ -11,10 +11,21 @@ import java.util.PriorityQueue;
  * This class is used to read / write the local scores file (comma separated values)
  */
 class ScoreIO {
+
+    // Score
     private PriorityQueue<Score> scores;
 
+    /**
+     * ScoreIO constructor
+     */
     ScoreIO() {
         scores = new PriorityQueue<Score>(new Comparator<Score>() {
+            /**
+             * Comparing score
+             * @param s1
+             * @param s2
+             * @return
+             */
             @Override
             public int compare(Score s1, Score s2) {
                 return (int) (s2.getScore() - s1.getScore());
@@ -23,6 +34,9 @@ class ScoreIO {
         readScoresFile();
     }
 
+    /**
+     * Read the score from the file in the local storage
+     */
     private void readScoresFile() {
         FileHandle handle = Gdx.files.local("localstorage/scores");
         if (handle.exists()) {
@@ -50,6 +64,11 @@ class ScoreIO {
         }
     }
 
+    /**
+     * Write the score to the local storage's file
+     * @param scoreToAdd Score that needs to be written to the file
+     * @return return true or false to see whether the file has been successfully written
+     */
     public boolean writeToScoresFile(Score scoreToAdd) {
         String scoreString = scoreToAdd.getName() + "," + scoreToAdd.getLevel() + "," + scoreToAdd.getScore() + "\r\n";
         FileHandle handle = Gdx.files.local("localstorage/scores");
@@ -74,6 +93,10 @@ class ScoreIO {
         }
     }
 
+    /**
+     * Getter method to retrieve the score
+     * @return the score
+     */
     public PriorityQueue<Score> getScores() {
         return this.scores;
     }

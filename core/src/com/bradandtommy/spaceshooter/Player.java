@@ -13,28 +13,44 @@ import com.badlogic.gdx.math.Vector2;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * Represent the player
+ */
 public class Player {
+
+    // Player's texture sheet and its corresponding frames along with its animation
     private SpriteBatch batch;
     private Sprite sprite;
     private Texture playerSheet;
     private Animation playerAnimation;
     private float stateTime;
 
+    // Constant for the player's frame
     private static final int ROWS = 3;
     private static final int COLUMNS = 3;
     private static final float FRAME_DURATION = 0.033f;
 
+    // Player's size, coordinate, movement and velocity
     private float x, y;
     private Vector2 movement;
     private Vector2 velocity;
 
+    // Flag for has fired
     private boolean hasFired;
+
+    // Flag to determine whether the player is dead or not and set it to false by default
     private boolean dead;
 
+    // Array list for storing the bullets
     public ArrayList<Bullet> bullets;
+
+    // Elapsed time for last call and when the player fires the bullets
     private long timeElapsedSinceLastCalled;
     private final long shootCooldownMillis = 300;
 
+    /**
+     * Player's constructor
+     */
     public Player() {
         this.dead = false;
         this.batch = new SpriteBatch();
@@ -46,6 +62,10 @@ public class Player {
         this.bullets = new ArrayList<Bullet>();
     }
 
+    /**
+     * Initialising the player's sprite
+     * @param spriteFilePath File path for the player's sprite
+     */
     public void initSprite(String spriteFilePath) {
         playerSheet = new Texture(Gdx.files.internal(spriteFilePath));
 
@@ -60,11 +80,20 @@ public class Player {
         playerAnimation = new Animation<TextureRegion>(FRAME_DURATION, playerFrames);
     }
 
+    /**
+     * Set the camera
+     * @param camera orthographic camera
+     * @param x camera's x coordiate
+     * @param y camera's y coordiate
+     */
     public void setPos(OrthographicCamera camera, float x, float y) {
         this.setX(camera.position.x - x);
         this.setY(camera.position.y - y);
     }
 
+    /**
+     * Properties for player's coordinate
+     */
     public float getX() {
         return x;
     }
@@ -81,10 +110,15 @@ public class Player {
         this.y = newY;
     }
 
-    public boolean isDead() {
-        return this.dead;
-    }
+    /**
+     * Getter method for retrieving the flag that determines whether the player is dead or not
+     * @return the eplayer is dead flag
+     */
+    public boolean isDead() { return this.dead; }
 
+    /**
+     * Draw the player
+     */
     public void draw() {
         batch.begin();
         stateTime += Gdx.graphics.getDeltaTime();
@@ -93,10 +127,19 @@ public class Player {
         batch.end();
     }
 
+    /**
+     * Rendering the player's animation
+     * @param stateTime
+     * @return player's animation
+     */
     public Sprite render(float stateTime) {
         return new Sprite((TextureRegion) playerAnimation.getKeyFrame(stateTime, true));
     }
 
+    /**
+     * Player's movement
+     * @param deltaTime delta time since the previous rendering time
+     */
     public void move(float deltaTime) {
         GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
         /* Instead of applying velocity directly, have it persist between frames so
@@ -148,6 +191,10 @@ public class Player {
         }
     }
 
+    /**
+     * Updating the player
+     * @param timeElapsedWhenCalled delta time when being called
+     */
     public void update(long timeElapsedWhenCalled) {
         // Move bullets
         for (Bullet bullet : bullets) {
@@ -178,6 +225,10 @@ public class Player {
         }
     }
 
+    /**
+     * Has fired flag for the player
+     * @return the fire flag
+     */
     public boolean hasFired() {
         GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
         if (g.getInputPoller().shoot.isDown) {
@@ -186,6 +237,9 @@ public class Player {
         return hasFired;
     }
 
+    /**
+     * Player's size property
+    */
     public float getWidth() {
         TextureRegion[][] temp = TextureRegion.split(playerSheet, playerSheet.getWidth() / COLUMNS, playerSheet.getHeight() / ROWS);
         Sprite s = new Sprite(temp[0][0]);
@@ -198,12 +252,20 @@ public class Player {
         return s.getHeight();
     }
 
+    /**
+     * Rectangle boundary for the player
+     * @return the player's bound box
+     */
     public Rectangle getBoundingRectangle() {
         TextureRegion[][] temp = TextureRegion.split(playerSheet, playerSheet.getWidth() / COLUMNS, playerSheet.getHeight() / ROWS);
         Sprite s = new Sprite(temp[0][0]);
         return new Rectangle(this.getX() + 20, this.getY() + 22, s.getWidth() / 3f, s.getHeight() / 3f);
     }
 
+    /**
+     * Get the spawning bullet array
+     * @return the array of bullets
+     */
     public ArrayList<Bullet> getSpawnedBullets() {
         return bullets;
     }

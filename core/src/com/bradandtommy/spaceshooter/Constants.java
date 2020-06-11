@@ -1,6 +1,10 @@
 package com.bradandtommy.spaceshooter;
 
+/**
+ * Containing all of the constants for the game
+ */
 public class Constants {
+
     // The constants for the buttons
     public static final String BUTTON_LONG_UP_TEXTURE_FILENAME = "buttonLong_blue.png";
     public static final String BUTTON_LONG_DOWN_TEXTURE_FILENAME = "buttonLong_blue.png";
@@ -48,6 +52,7 @@ public class Constants {
     public static final int PLAYER_INIT_LIVES = 3;
     public static final int PLAYER_MAX_LIVES = 5;
 
+    // Constant for the enemies including the boss
     public static final String ENEMY_NORMAL_SPRITESHEET = "sprites/Enemy.png";
     public static final String ENEMY_NORMAL_SPRITESHEET_ALT = "sprites/Enemy_shooting.png";
     public static final String ENEMY_BOSS_SPRITESHEET = "sprites/Boss.png";

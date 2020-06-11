@@ -13,42 +13,67 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 
+/**
+ * Presenting the enemies including the boss
+ */
 public class Enemy {
 
+    // Enum for the enemy kind
     public enum EnemyKind { NORMAL, BOSS, BOUNTY }
 
+    // Enemy's texture sheet and its corresponding frames along with its animation
     private Sprite sprite;
     private Texture enemySheet;
     private Animation enemyAnimation;
     private TextureRegion[] enemyFrames;
     private float stateTime;
 
+    // Shooting animation
     private Animation shootingAnimation;
     private TextureRegion[] shootingFrames;
     private Animation noShootingAnimation;
     private TextureRegion[] noShootingFrames;
+
+    // Instance for storing enemy kind
     public EnemyKind enemykind;
 
-
-    public boolean dead = false;
-
+    // Constant for the enemy's frame
     private static final int ROWS = 3;
     private static final int COLUMNS = 3;
     private static final float FRAME_DURATION = 0.033f;
 
+    // Enemy's size, coordinate, movement and velocity
     private float x, y;
     private Vector2 movement;
     private Vector2 velocity;
+
+    // Flag for has fired
     private boolean hasFired;
+
+    // Flag to determine whether the enemy is dead or not and set it to false by default
+    public boolean dead = false;
+
+    // Elapsed time for last call and when the boss fires its bullet (beam)
     private long timeElapsedSinceLastCalled;
     private long timeElapsedSinceBossFired;
+
+    // Shooting cooldown
     private final long shootCooldownMillis = 400;
     private final long bossShootCooldownMillis = 2310;
+
+    // Health
     private int health = 1;
+
+    // Flag for checking boss has finished shooting or not
     private boolean bossFinishedShooting;
 
+    // Array list for storing the bullets
     public ArrayList<Bullet> bullets;
 
+    /**
+     * Enemy's constructor
+     * @param enemykind enemy kind
+     */
     public Enemy(EnemyKind enemykind) {
         this.enemykind = enemykind;
 
@@ -66,7 +91,12 @@ public class Enemy {
         stateTime = 0.0f;
     }
 
+    /**
+     * Initialising the enemy sprite
+     */
     public void initSprite() {
+
+        // Enemy sprite sheets
         switch (enemykind) {
             case NORMAL:
                 enemySheet = new Texture(Constants.ENEMY_NORMAL_SPRITESHEET);
@@ -91,9 +121,7 @@ public class Enemy {
         }
         noShootingAnimation = new Animation<TextureRegion>(FRAME_DURATION, noShootingFrames);
 
-        /**
-         * Build shooting frames
-         */
+        //Build shooting frames
         switch (enemykind) {
             case NORMAL:
                 enemySheet = new Texture(Constants.ENEMY_NORMAL_SPRITESHEET_ALT);
@@ -116,6 +144,10 @@ public class Enemy {
         shootingAnimation = new Animation<TextureRegion>(FRAME_DURATION, shootingFrames);
     }
 
+    /**
+     * Switching to shooting sprite and vice versa
+     * @param isShooting flag to determine whether the enemy is shooting or not
+     */
     public void switchSprite(Boolean isShooting) {
         if (isShooting) {
             enemyFrames = shootingFrames;
@@ -126,12 +158,20 @@ public class Enemy {
         }
     }
 
-
+    /**
+     * Set the camera
+     * @param camera orthographic camera
+     * @param x camera's x coordiate
+     * @param y camera's y coordiate
+     */
     public void setPos(OrthographicCamera camera, float x, float y) {
         this.setX(camera.position.x - x);
         this.setY(camera.position.y - y);
     }
 
+    /**
+     * Properties for enemies' size, coordinate and health
+     */
     public float getX() {
         return x;
     }
@@ -148,13 +188,45 @@ public class Enemy {
         this.y = newY;
     }
 
+    public float getWidth() {
+        return enemyFrames[0].getRegionWidth();
+    }
+
+    public float getHeight() {
+        return enemyFrames[0].getRegionHeight();
+    }
+
+    public int getHealth() { return this.health; }
+
+    public void setHealth(int h) {
+        this.health = h;
+    }
+
+    /**
+     * Getter method for retrieving the that determines whether the enemy is dead or not
+     * @return the enemy is dead flag
+     */
     public boolean isDead() {
         return this.dead;
     }
 
+    /**
+     * Getter method for retrieving the has fired flag
+     * @return
+     */
+    public boolean hasFired() {
+        return hasFired;
+    }
+
+    /**
+     * Draw the enemy
+     * @param batch sprite batch
+     */
     public void draw(SpriteBatch batch) {
-        /** Draw enemy */
+
+        //Draw enemy
         batch.begin();
+
         // Determine current frame corresponding to the state time
         stateTime += Gdx.graphics.getDeltaTime();
         this.sprite = new Sprite((TextureRegion) enemyAnimation.getKeyFrame(stateTime, true));
@@ -167,10 +239,13 @@ public class Enemy {
         }
     }
 
+    /**
+     * Enemies' movement
+     * @param deltaTime delta time since the previous rendering time
+     */
     public void move(float deltaTime) {
         GameScreen g = SpaceShooter.getSpaceShooterInstance().getGameScreen();
 
-        //movement.set(0f, 0f);
         if (enemykind != EnemyKind.BOSS) {
             movement.y -= 1;
         }
@@ -222,6 +297,12 @@ public class Enemy {
         }
     }
 
+    /**
+     * Enemies' firing rate
+     * @param kind enemy kind
+     * @param timeElapsedWhenCalled elapsed time when called
+     * @return false by default
+     */
     private boolean firingTimer(EnemyKind kind, long timeElapsedWhenCalled) {
         long cooldown = 0;
 
@@ -238,7 +319,13 @@ public class Enemy {
         return false;
     }
 
+    /**
+     * Updating the enemy
+     * @param deltaTime delta time since the previous rendering time
+     * @param camera orthographic camera
+     */
     public void update(float deltaTime, OrthographicCamera camera) {
+
         // Move bullets
         for (Bullet bullet : bullets) {
             bullet.update(deltaTime);
@@ -288,26 +375,10 @@ public class Enemy {
             }
         }
     }
-
-    public int getHealth() {
-        return this.health;
-    }
-
-    public void setHealth(int h) {
-        this.health = h;
-    }
-
-    public boolean hasFired() {
-        return hasFired;
-    }
-
-    public float getWidth() {
-        return enemyFrames[0].getRegionWidth();
-    }
-
-    public float getHeight() {
-        return enemyFrames[0].getRegionHeight();
-    }
+/**
+ * Rectangle boundary for the enemy
+ * @return the enemy's bound box
+ */
 
     public Rectangle getBoundingRectangle() {
         if (enemykind == EnemyKind.BOSS) {

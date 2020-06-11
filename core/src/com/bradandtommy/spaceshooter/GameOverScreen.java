@@ -9,7 +9,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * Represent Game over screen
+ */
 public class GameOverScreen implements Screen, InputProcessor {
+
+    // Sprite batch
     private SpriteBatch batch;
 
     // Labels
@@ -37,17 +42,26 @@ public class GameOverScreen implements Screen, InputProcessor {
     private boolean backToMenuActive;
     private boolean playAgainActive;
 
+    // Instance for new high score
     private boolean newHighScore;
 
     // Keyboard listener
     private AlphaInputPoller alpha;
 
+    /**
+     *
+     * @param score
+     * @param newHighScore
+     */
     public GameOverScreen(Score score, boolean newHighScore) {
         this.newHighScore = newHighScore;
         this.score = score;
         this.scoreIO = new ScoreIO();
     }
 
+    /**
+     * Create necessary object and do some appropriate setup
+     */
     private void create() {
         hint = "Press ENTER to add your score to the high scores table";
         this.alpha = new AlphaInputPoller();
@@ -144,6 +158,9 @@ public class GameOverScreen implements Screen, InputProcessor {
 
     }
 
+    /**
+     * Create the game over screen with the score the player has achieved
+     */
     private void createWithScore() {
         this.create();
         BitmapFont labelFont = new BitmapFont(
@@ -161,6 +178,9 @@ public class GameOverScreen implements Screen, InputProcessor {
 
     }
 
+    /**
+     * Showing the game over screen
+     */
     @Override
     public void show() {
         if (!this.newHighScore) {
@@ -170,6 +190,10 @@ public class GameOverScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Main loop, call/do all logic and rendering.
+     * @param delta delta time since the previous rendering time
+     */
     @Override
     public void render(float delta) {
         //Set background color and clear the screen
@@ -287,6 +311,9 @@ public class GameOverScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Poll for the input
+     */
     private void pollForInput() {
         this.alpha.stringBuffer(name);
     }
@@ -311,6 +338,9 @@ public class GameOverScreen implements Screen, InputProcessor {
 
     }
 
+    /**
+     * Cleanup done after the game closes.
+     */
     @Override
     public void dispose() {
         gameOverMusic.dispose();
@@ -331,6 +361,14 @@ public class GameOverScreen implements Screen, InputProcessor {
         return false;
     }
 
+    /**
+     * Called when the screen was touched or a mouse button was pressed
+     * @param screenX The x coordinate, origin is in the upper left corner
+     * @param screenY The y coordinate, origin is in the upper left corner
+     * @param pointer the pointer for the event.
+     * @param button the button
+     * @return whether the input was processed
+     */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         backToMenuButton.update(true, screenX, screenY);
@@ -338,6 +376,14 @@ public class GameOverScreen implements Screen, InputProcessor {
         return true;
     }
 
+    /**
+     * Called when a finger was lifted or a mouse button was released
+     * @param screenX The x coordinate, origin is in the upper left corner
+     * @param screenY The y coordinate, origin is in the upper left corner
+     * @param pointer the pointer for the event.
+     * @param button the button
+     * @return whether the input was processed
+     */
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         backToMenuButton.update(false, screenX, screenY);
